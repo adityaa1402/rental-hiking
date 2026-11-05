@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 60" width="260" height="60">
+  <path d="M12 45 L25 15 L38 45 Z" fill="#E99A45"/>
+  <path d="M22 45 L32 23 L42 45 Z" fill="#A8B8A0" opacity="0.85"/>
+  <path d="M25 15 L28 22 L22 22 Z" fill="#ffffff"/>
+  <text x="52" y="34" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="20" font-weight="800" fill="#ffffff" letter-spacing="1">HIKETRIP</text>
+  <text x="156" y="34" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="20" font-weight="800" fill="#E99A45" letter-spacing="1">RENTAL</text>
+  <text x="53" y="47" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="8.5" font-weight="600" fill="#A8B8A0" letter-spacing="1.2">GEAR UP, EXPLORE FURTHER</text>
+</svg>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 600" width="100%" height="100%">
+  <defs>
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#102D27"/>
+      <stop offset="50%" stop-color="#173F35"/>
+      <stop offset="100%" stop-color="#205044"/>
+    </linearGradient>
+    <linearGradient id="mtnGrad1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1c493e"/>
+      <stop offset="100%" stop-color="#0e2621"/>
+    </linearGradient>
+    <linearGradient id="mtnGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#245c4f"/>
+      <stop offset="100%" stop-color="#0a1d19"/>
+    </linearGradient>
+  </defs>
+  <rect width="1440" height="600" fill="url(#skyGrad)"/>
+  <polygon points="0,600 180,320 400,520 680,240 920,480 1200,210 1440,490 1440,600" fill="url(#mtnGrad1)" opacity="0.7"/>
+  <polygon points="0,600 240,380 480,560 760,310 1020,530 1340,340 1440,430 1440,600" fill="url(#mtnGrad2)" opacity="0.9"/>
+  <polygon points="0,600 320,440 600,600 880,410 1140,580 1440,460 1440,600" fill="#0d231e"/>
+  <circle cx="200" cy="120" r="2" fill="#E99A45" opacity="0.8"/>
+  <circle cx="550" cy="90" r="2.5" fill="#ffffff" opacity="0.7"/>
+  <circle cx="840" cy="150" r="2" fill="#E99A45" opacity="0.9"/>
+  <circle cx="1180" cy="80" r="3" fill="#ffffff" opacity="0.8"/>
+  <circle cx="1340" cy="160" r="1.8" fill="#ffffff" opacity="0.6"/>
+</svg>
