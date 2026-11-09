@@ -28,9 +28,7 @@
             @foreach($packages as $pkg)
                 @php
                     // Ambil items dalam paket
-                    $itemsInPackage = \App\Models\DetailPaket::where('id_paket', $pkg->id_paket)
-                        ->with('alatHiking')
-                        ->get();
+                    $itemsInPackage = $pkg->detailPaket;
                     
                     // Hitung total normal vs harga paket
                     $normalTotal = 0;

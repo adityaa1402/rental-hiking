@@ -44,11 +44,7 @@
                         @if($selectedItem)
                             <input type="hidden" name="alat_id" value="{{ $selectedItem->id_alat }}">
                             <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
-                                @php
-                                    $imgSrc = file_exists(public_path('uploads/barang/' . $selectedItem->gambar)) 
-                                        ? asset('uploads/barang/' . $selectedItem->gambar) 
-                                        : asset('assets/images/logo.svg');
-                                @endphp
+                                @php($imgSrc = getProductImageUrl($selectedItem))
                                 <img src="{{ $imgSrc }}" alt="{{ $selectedItem->nama_alat }}" class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
                                 <div>
                                     <div class="text-muted small">{{ $selectedItem->kategori->nama_kategori }}</div>
@@ -91,11 +87,11 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Tanggal Mulai Sewa <span class="text-danger">*</span></label>
-                                <input type="date" name="tgl_sewa" class="form-control" value="{{ old('tgl_sewa', date('Y-m-d')) }}" min="{{ date('Y-m-d') }}" required>
+                                <input type="date" name="tgl_sewa" id="tgl_sewa" class="form-control" value="{{ old('tgl_sewa', date('Y-m-d')) }}" min="{{ date('Y-m-d') }}" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Tanggal Pengembalian <span class="text-danger">*</span></label>
-                                <input type="date" name="tgl_kembali" class="form-control" value="{{ old('tgl_kembali', date('Y-m-d', strtotime('+2 days'))) }}" min="{{ date('Y-m-d') }}" required>
+                                <input type="date" name="tgl_kembali" id="tgl_kembali" class="form-control" value="{{ old('tgl_kembali', date('Y-m-d', strtotime('+2 days'))) }}" min="{{ date('Y-m-d', strtotime('+1 day')) }}" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Jumlah Unit <span class="text-danger">*</span></label>
@@ -104,14 +100,14 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold">Metode Pengambilan <span class="text-danger">*</span></label>
-                                <select name="metode_pengambilan" class="form-select" required>
+                                <select name="metode_pengambilan" id="metode_pengambilan" class="form-select" required>
                                     <option value="Ambil di Toko" {{ old('metode_pengambilan') == 'Ambil di Toko' ? 'selected' : '' }}>Ambil di Toko (Gratis)</option>
                                     <option value="Kirim via Kurir" {{ old('metode_pengambilan') == 'Kirim via Kurir' ? 'selected' : '' }}>Kirim via Kurir (+{{ formatRupiah($shopSettings['biaya_pengiriman_flat']) }})</option>
                                 </select>
                             </div>
-                            <div class="col-12">
-                                <label class="form-label fw-semibold">Alamat Pengiriman (Jika Kirim Kurir)</label>
-                                <textarea name="alamat_pengiriman" class="form-control" rows="2" placeholder="Jl. Nama Jalan, Kota, Kode Pos">{{ old('alamat_pengiriman', auth()->user()->alamat) }}</textarea>
+                            <div class="col-12" id="alamat_pengiriman_wrapper" style="display: {{ old('metode_pengambilan') == 'Kirim via Kurir' ? 'block' : 'none' }};">
+                                <label class="form-label fw-semibold">Alamat Pengiriman <span class="text-danger">*</span></label>
+                                <textarea name="alamat_pengiriman" id="alamat_pengiriman" class="form-control" rows="2" placeholder="Jl. Nama Jalan, Kota, Kode Pos">{{ old('alamat_pengiriman', auth()->user()->alamat) }}</textarea>
                             </div>
                             <div class="col-12">
                                 <label class="form-label fw-semibold">Catatan Tambahan (Opsional)</label>
@@ -185,4 +181,49 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const metodeSelect = document.getElementById('metode_pengambilan');
+    const alamatWrapper = document.getElementById('alamat_pengiriman_wrapper');
+    const alamatField = document.getElementById('alamat_pengiriman');
+    const tanggalSewa = document.getElementById('tgl_sewa');
+    const tanggalKembali = document.getElementById('tgl_kembali');
+
+    function updateTanggalKembaliMinimum() {
+        const [year, month, day] = tanggalSewa.value.split('-').map(Number);
+        const minimum = new Date(year, month - 1, day + 1);
+        const minimumValue = [
+            minimum.getFullYear(),
+            String(minimum.getMonth() + 1).padStart(2, '0'),
+            String(minimum.getDate()).padStart(2, '0')
+        ].join('-');
+
+        tanggalKembali.min = minimumValue;
+        if (tanggalKembali.value < minimumValue) {
+            tanggalKembali.value = minimumValue;
+        }
+    }
+
+    // Function untuk handle show/hide alamat pengiriman
+    function toggleAlamatField() {
+        if (metodeSelect.value === 'Kirim via Kurir') {
+            alamatWrapper.style.display = 'block';
+            alamatField.setAttribute('required', 'required');
+        } else {
+            alamatWrapper.style.display = 'none';
+            alamatField.removeAttribute('required');
+            alamatField.value = '';
+        }
+    }
+
+    // Trigger on change
+    metodeSelect.addEventListener('change', toggleAlamatField);
+    tanggalSewa.addEventListener('change', updateTanggalKembaliMinimum);
+
+    // Initial check on page load
+    updateTanggalKembaliMinimum();
+    toggleAlamatField();
+});
+</script>
 @endsection

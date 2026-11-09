@@ -98,9 +98,7 @@
                         @foreach($items as $item)
                             @php
                                 $avail = getItemAvailability($item->id_alat);
-                                $imgSrc = file_exists(public_path('uploads/barang/' . $item->gambar)) 
-                                    ? asset('uploads/barang/' . $item->gambar) 
-                                    : asset('assets/images/logo.svg');
+                                $imgSrc = getProductImageUrl($item);
                             @endphp
                             <div class="col-md-6 col-lg-4">
                                 <div class="gear-card">

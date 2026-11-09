@@ -1,44 +1,36 @@
 @echo off
-echo ================================
-echo  HIKETRIP RENTAL - Setup Script
-echo ================================
-echo.
+setlocal
+cd /d "%~dp0"
 
-echo [1/5] Checking Laravel installation...
-php artisan --version
+echo HIKETRIP RENTAL - Setup
 echo.
+where php >nul 2>nul || (echo PHP tidak ditemukan. Aktifkan PHP melalui Laragon lalu coba lagi.& exit /b 1)
+where composer >nul 2>nul || (echo Composer tidak ditemukan. Instal Composer lalu coba lagi.& exit /b 1)
+where npm >nul 2>nul || (echo Node.js/npm tidak ditemukan. Instal Node.js lalu coba lagi.& exit /b 1)
 
-echo [2/5] Creating storage link...
+if not exist .env (
+    copy .env.example .env >nul
+    echo File .env dibuat. Isi koneksi database sebelum melanjutkan.
+    pause
+)
+
+findstr /R /C:"^APP_KEY=base64:." .env >nul
+if errorlevel 1 php artisan key:generate
+if errorlevel 1 exit /b 1
+
+call composer install
+if errorlevel 1 exit /b 1
+php artisan migrate
+if errorlevel 1 exit /b 1
 php artisan storage:link
-echo.
-
-echo [3/5] Clearing cache...
-php artisan config:clear
-php artisan cache:clear
-php artisan view:clear
-echo.
-
-echo [4/5] Installing NPM dependencies...
+if errorlevel 1 exit /b 1
 call npm install
+if errorlevel 1 exit /b 1
 call npm run build
-echo.
+if errorlevel 1 exit /b 1
 
-echo [5/5] Setup complete!
 echo.
-echo ================================
-echo  NEXT STEPS:
-echo ================================
-echo 1. Import database via HeidiSQL:
-echo    File: C:\laragon\www\hikettrip-rental\database\hikettrip_rental.sql
-echo.
-echo 2. Start Laravel server:
-echo    php artisan serve
-echo.
-echo 3. Open browser: http://localhost:8000
-echo.
-echo Login Demo:
-echo - Admin: admin@hikettrip.com / admin123
-echo - Customer: customer@hikettrip.com / customer123
-echo ================================
-
+echo Setup selesai. Jalankan start.bat untuk membuka server.
+echo Panduan lengkap tersedia di PANDUAN_PENGGUNA.md.
 pause
+endlocal

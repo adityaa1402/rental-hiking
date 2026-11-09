@@ -7,7 +7,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <h4 class="fw-bold mb-0" style="color:#173F35;"><i class="bi bi-box-seam me-2"></i>Data Barang</h4>
-        <div class="text-muted small">Total: {{ $alats->total() }} barang</div>
+        <div class="text-muted small">Total: {{ $barangList->total() }} barang</div>
     </div>
     <a href="{{ route('admin.barang.create') }}" class="btn btn-brand px-4">
         <i class="bi bi-plus-circle me-1"></i> Tambah Barang
@@ -26,7 +26,7 @@
                 <label class="form-label small fw-semibold text-muted">Kategori</label>
                 <select name="kategori" class="form-select">
                     <option value="">Semua Kategori</option>
-                    @foreach($kategoris as $kat)
+                    @foreach($kategoriList as $kat)
                     <option value="{{ $kat->id_kategori }}" {{ request('kategori')==$kat->id_kategori?'selected':'' }}>
                         {{ $kat->nama_kategori }}
                     </option>
@@ -37,10 +37,10 @@
                 <label class="form-label small fw-semibold text-muted">Kondisi</label>
                 <select name="kondisi" class="form-select">
                     <option value="">Semua Kondisi</option>
-                    <option value="Baik Sekali" {{ request('kondisi')=='Baik Sekali'?'selected':'' }}>Baik Sekali</option>
                     <option value="Baik" {{ request('kondisi')=='Baik'?'selected':'' }}>Baik</option>
-                    <option value="Cukup" {{ request('kondisi')=='Cukup'?'selected':'' }}>Cukup</option>
-                    <option value="Perlu Perbaikan" {{ request('kondisi')=='Perlu Perbaikan'?'selected':'' }}>Perlu Perbaikan</option>
+                    <option value="Perlu Perawatan" {{ request('kondisi')=='Perlu Perawatan'?'selected':'' }}>Perlu Perawatan</option>
+                    <option value="Rusak" {{ request('kondisi')=='Rusak'?'selected':'' }}>Rusak</option>
+                    <option value="Sedang Dibersihkan" {{ request('kondisi')=='Sedang Dibersihkan'?'selected':'' }}>Sedang Dibersihkan</option>
                 </select>
             </div>
             <div class="col-md-2">
@@ -54,7 +54,7 @@
 
 <div class="card border-0 rounded-4 shadow-sm">
     <div class="card-body p-0">
-        @if($alats->count() > 0)
+        @if($barangList->count() > 0)
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead style="background:#f8faf9;">
@@ -69,11 +69,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($alats as $alat)
+                    @foreach($barangList as $alat)
                     <tr>
                         <td class="ps-4">
                             @if($alat->gambar)
-                                <img src="{{ Storage::url($alat->gambar) }}" class="rounded-3"
+                                <img src="{{ Storage::url('barang/' . $alat->gambar) }}" class="rounded-3"
                                     style="width:55px;height:50px;object-fit:cover;">
                             @else
                                 <div class="rounded-3 bg-light d-flex align-items-center justify-content-center"
@@ -103,10 +103,10 @@
                         </td>
                         <td class="text-center">
                             <span class="badge
-                                @if($alat->kondisi=='Baik Sekali') bg-primary
-                                @elseif($alat->kondisi=='Baik') bg-success
-                                @elseif($alat->kondisi=='Cukup') bg-warning text-dark
-                                @else bg-danger @endif
+                                @if($alat->kondisi=='Baik') bg-success
+                                @elseif($alat->kondisi=='Perlu Perawatan') bg-warning text-dark
+                                @elseif($alat->kondisi=='Rusak') bg-danger
+                                @else bg-secondary @endif
                                 " style="font-size:0.72rem;">
                                 {{ $alat->kondisi }}
                             </span>
@@ -116,6 +116,10 @@
                                 <a href="{{ route('admin.barang.show', $alat->id_alat) }}"
                                     class="btn btn-sm btn-outline-secondary" title="Detail">
                                     <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ route('admin.barang.gallery.create', $alat->id_alat) }}"
+                                    class="btn btn-sm btn-outline-info" title="Kelola Gallery">
+                                    <i class="bi bi-images"></i>
                                 </a>
                                 <a href="{{ route('admin.barang.edit', $alat->id_alat) }}"
                                     class="btn btn-sm btn-outline-warning" title="Edit">
@@ -136,7 +140,7 @@
             </table>
         </div>
         <div class="p-4">
-            {{ $alats->appends(request()->query())->links() }}
+            {{ $barangList->appends(request()->query())->links() }}
         </div>
         @else
         <div class="text-center py-5 text-muted">

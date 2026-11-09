@@ -49,11 +49,11 @@
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
                                 <label class="form-label small fw-semibold">Password <span class="text-danger">*</span></label>
-                                <input type="password" name="password" class="form-control" placeholder="Minimal 6 karakter" required>
+                                <input type="password" name="password" class="form-control" placeholder="Minimal 8 karakter" minlength="8" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-semibold">Konfirmasi Password <span class="text-danger">*</span></label>
-                                <input type="password" name="password_confirmation" class="form-control" placeholder="Ketik ulang password" required>
+                                <input type="password" name="password_confirmation" class="form-control" placeholder="Ulangi password (minimal 8 karakter)" minlength="8" required>
                             </div>
                         </div>
 

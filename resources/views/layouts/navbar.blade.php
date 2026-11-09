@@ -30,6 +30,15 @@
                         <i class="bi bi-boxes me-1"></i> Paket Sewa
                     </a>
                 </li>
+                @auth
+                    @if(auth()->user()->role === 'customer')
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('customer.transaksi.*') ? 'active' : '' }}" href="{{ route('customer.transaksi.index') }}">
+                                <i class="bi bi-receipt me-1"></i> Pesanan
+                            </a>
+                        </li>
+                    @endif
+                @endauth
                 <li class="nav-item">
                     <a class="nav-link {{ request()->is('tentang') ? 'active' : '' }}" href="{{ route('tentang') }}">
                         <i class="bi bi-info-circle me-1"></i> Tentang Kami

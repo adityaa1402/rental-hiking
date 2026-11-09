@@ -50,6 +50,7 @@ class BarangController extends Controller
             'spesifikasi'   => 'required|string',
             'harga_per_hari'=> 'required|numeric|min:0',
             'stok_total'    => 'required|integer|min:0',
+            'stok_rusak'    => 'nullable|integer|min:0|lte:stok_total',
             'kondisi'       => 'required|in:Baik,Perlu Perawatan,Rusak,Sedang Dibersihkan',
             'gambar'        => 'required|image|mimes:jpg,jpeg,png,webp|max:3072',
         ]);
@@ -91,6 +92,7 @@ class BarangController extends Controller
             'spesifikasi'   => 'required|string',
             'harga_per_hari'=> 'required|numeric|min:0',
             'stok_total'    => 'required|integer|min:0',
+            'stok_rusak'    => 'required|integer|min:0|lte:stok_total',
             'kondisi'       => 'required|in:Baik,Perlu Perawatan,Rusak,Sedang Dibersihkan',
             'gambar'        => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
         ]);
@@ -112,4 +114,3 @@ class BarangController extends Controller
         return redirect()->route('admin.barang.index')->with('success', 'Barang berhasil dihapus.');
     }
 }
-

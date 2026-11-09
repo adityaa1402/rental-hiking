@@ -52,6 +52,8 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'alat_id'           => 'nullable|integer|exists:alat_hiking,id_alat',
+            'paket_id'          => 'nullable|integer|exists:paket_sewa,id_paket',
             'tgl_sewa'          => 'required|date|after_or_equal:today',
             'tgl_kembali'       => 'required|date|after:tgl_sewa',
             'jumlah_unit'       => 'required|integer|min:1|max:10',
@@ -68,6 +70,12 @@ class BookingController extends Controller
             'dokumen_jaminan.max'     => 'Ukuran file maksimal 3MB.',
             'setuju_syarat.accepted'  => 'Anda harus menyetujui syarat & ketentuan.',
         ]);
+
+        if ($request->filled('alat_id') === $request->filled('paket_id')) {
+            return back()->withErrors([
+                'alat_id' => 'Pilih tepat satu alat atau satu paket untuk disewa.',
+            ])->withInput();
+        }
 
         $setting = Pengaturan::getSetting();
         $tglSewa    = $request->tgl_sewa;
@@ -110,6 +118,9 @@ class BookingController extends Controller
             if (!$paket || !$paket->status_aktif) {
                 return back()->withErrors(['paket_id' => 'Paket tidak ditemukan atau tidak aktif.'])->withInput();
             }
+            if ($paket->detailPaket->isEmpty()) {
+                return back()->withErrors(['paket_id' => 'Paket ini belum memiliki komponen barang dan belum dapat disewa.'])->withInput();
+            }
 
             // Validasi stok semua komponen paket
             foreach ($paket->detailPaket as $detail) {
@@ -139,9 +150,15 @@ class BookingController extends Controller
         $biayaPengiriman = $request->metode_pengambilan === 'Kirim via Kurir'
             ? $setting['biaya_pengiriman_flat']
             : 0;
+
+        // Alamat pengiriman hanya disimpan jika metode adalah "Kirim via Kurir"
+        $alamatPengiriman = $request->metode_pengambilan === 'Kirim via Kurir'
+            ? $request->alamat_pengiriman
+            : null;
+
         $totalHarga = $subtotal + $biayaPengiriman;
 
-        DB::transaction(function () use ($request, $tglSewa, $tglKembali, $totalHari, $subtotal, $biayaPengiriman, $totalHarga, $itemData) {
+        DB::transaction(function () use ($request, $tglSewa, $tglKembali, $totalHari, $subtotal, $biayaPengiriman, $totalHarga, $itemData, $alamatPengiriman) {
             $transaksi = Transaksi::create([
                 'kode_transaksi'     => generateTransactionCode(),
                 'id_user'            => auth()->id(),
@@ -154,7 +171,7 @@ class BookingController extends Controller
                 'denda'              => 0,
                 'total_harga'        => $totalHarga,
                 'metode_pengambilan' => $request->metode_pengambilan,
-                'alamat_pengiriman'  => $request->alamat_pengiriman,
+                'alamat_pengiriman'  => $alamatPengiriman,
                 'status_transaksi'   => 'Pending',
                 'catatan_customer'   => $request->catatan_customer,
             ]);
@@ -181,4 +198,3 @@ class BookingController extends Controller
             ->with('success', 'Booking berhasil dikirim! Mohon tunggu konfirmasi dari admin.');
     }
 }
-

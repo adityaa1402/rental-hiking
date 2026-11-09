@@ -121,9 +121,7 @@
                 @foreach($produkPopuler as $item)
                     @php
                         $avail = getItemAvailability($item->id_alat);
-                        $imgSrc = file_exists(public_path('uploads/barang/' . $item->gambar)) 
-                            ? asset('uploads/barang/' . $item->gambar) 
-                            : asset('assets/images/logo.svg');
+                        $imgSrc = getProductImageUrl($item);
                     @endphp
                     <div class="col-md-6 col-lg-4">
                         <div class="gear-card">
@@ -192,14 +190,75 @@
                         </div>
                         <div class="col-lg-4 text-center mt-4 mt-lg-0">
                             <div class="p-3 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-25">
-                                <div class="display-5 fw-bold text-warning mb-1">Diskon 25%</div>
-                                <div class="small text-white-50">Dibandingkan harga sewa satuan terpisah</div>
+                                @if($paketDiskonTerbesar > 0)
+                                    <div class="display-5 fw-bold text-warning mb-1">Hemat {{ $paketDiskonTerbesar }}%</div>
+                                    <div class="small text-white-50">Dibandingkan harga sewa satuan per hari</div>
+                                @else
+                                    <div class="fs-4 fw-bold text-warning mb-1">Paket Aktif</div>
+                                    <div class="small text-white-50">Lihat pilihan perlengkapan dalam satu paket</div>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        @if($paketList->isNotEmpty())
+            <div class="mb-5">
+                <div class="d-flex justify-content-between align-items-end gap-3 mb-3 flex-wrap">
+                    <div>
+                        <span class="text-uppercase fw-bold text-success small">Paket Hemat</span>
+                        <h3 class="fw-bold text-dark mb-0">Pilih paket pendakian</h3>
+                    </div>
+                    <a href="{{ route('paket.index') }}" class="btn btn-outline-forest btn-sm">
+                        Semua paket <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                <div class="row g-3">
+                    @foreach($paketList as $paket)
+                        @php
+                            $hargaNormal = $paket->detailPaket->sum(
+                                fn ($detail) => ($detail->alatHiking?->harga_per_hari ?? 0) * $detail->jumlah_unit
+                            );
+                            $hemat = max(0, $hargaNormal - $paket->harga_paket_per_hari);
+                            $gambarPaketPath = 'uploads/paket/' . basename($paket->gambar ?? '');
+                            $gambarPaketUrl = $paket->gambar && is_file(public_path($gambarPaketPath))
+                                ? asset($gambarPaketPath)
+                                : ($paket->gambar ? asset('storage/' . $paket->gambar) : asset('assets/images/logo.svg'));
+                        @endphp
+                        <div class="col-md-6 col-xl-3">
+                            <article class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
+                                <img src="{{ $gambarPaketUrl }}" alt="{{ $paket->nama_paket }}" class="w-100" style="height: 170px; object-fit: cover;">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                        <h5 class="fw-bold mb-0">{{ $paket->nama_paket }}</h5>
+                                        <span class="badge bg-light text-dark flex-shrink-0">
+                                            {{ $paket->kapasitas_orang }} org
+                                        </span>
+                                    </div>
+                                    <p class="small text-muted flex-grow-1">{{ \Illuminate\Support\Str::limit($paket->deskripsi, 90) }}</p>
+                                    @if($hemat > 0)
+                                        <div class="small text-success fw-semibold mb-2">
+                                            Hemat {{ formatRupiah($hemat) }}/hari
+                                        </div>
+                                    @endif
+                                    <div class="d-flex justify-content-between align-items-end border-top pt-3 mt-auto">
+                                        <div>
+                                            <small class="text-muted d-block">Harga per hari</small>
+                                            <strong class="text-success">{{ formatRupiah($paket->harga_paket_per_hari) }}</strong>
+                                        </div>
+                                        <a href="{{ route('booking.create', ['paket_id' => $paket->id_paket]) }}" class="btn btn-brand btn-sm">
+                                            Pilih paket
+                                        </a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
 
         <!-- Cara Menyewa dalam 4 Langkah -->
         <div class="mb-5 pt-3">

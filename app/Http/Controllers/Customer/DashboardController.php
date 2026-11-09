@@ -14,13 +14,13 @@ class DashboardController extends Controller
         $user = auth()->user();
 
         $stats = [
-            'total'      => Transaksi::where('id_user', $user->id_user)->count(),
-            'pending'    => Transaksi::where('id_user', $user->id_user)->where('status_transaksi', 'Pending')->count(),
-            'berjalan'   => Transaksi::where('id_user', $user->id_user)->where('status_transaksi', 'Berjalan')->count(),
-            'selesai'    => Transaksi::where('id_user', $user->id_user)->where('status_transaksi', 'Selesai')->count(),
+            'total'      => Transaksi::where('id_user', $user->id)->count(),
+            'pending'    => Transaksi::where('id_user', $user->id)->where('status_transaksi', 'Pending')->count(),
+            'berjalan'   => Transaksi::where('id_user', $user->id)->where('status_transaksi', 'Berjalan')->count(),
+            'selesai'    => Transaksi::where('id_user', $user->id)->where('status_transaksi', 'Selesai')->count(),
         ];
 
-        $recentTransaksis = Transaksi::where('id_user', $user->id_user)
+        $recentTransaksis = Transaksi::where('id_user', $user->id)
             ->orderByDesc('id_transaksi')
             ->limit(5)
             ->get();

@@ -74,10 +74,10 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="text-center small">{{ $item->jumlah }}</td>
+                                        <td class="text-center small">{{ $item->jumlah_unit }}</td>
                                         <td class="text-end small">Rp {{ number_format($item->harga_per_hari_snapshot, 0, ',', '.') }}</td>
                                         <td class="text-end fw-semibold small" style="color:#173F35;">
-                                            Rp {{ number_format($item->harga_per_hari_snapshot * $item->jumlah * $transaksi->total_hari, 0, ',', '.') }}
+                                            Rp {{ number_format($item->harga_per_hari_snapshot * $item->jumlah_unit * $transaksi->total_hari, 0, ',', '.') }}
                                         </td>
                                     </tr>
                                     @endforeach
@@ -147,13 +147,89 @@
                     </div>
                 </div>
 
+                @if($transaksi->status_transaksi === 'Berjalan')
+                    <div class="alert alert-primary border-0 rounded-3 mb-4">
+                        <div class="fw-bold mb-1"><i class="bi bi-arrow-return-left me-2"></i>Pengembalian Barang</div>
+                        Kembalikan seluruh perlengkapan kepada petugas pada atau sebelum
+                        <strong>{{ \Carbon\Carbon::parse($transaksi->tgl_kembali)->format('d F Y') }}</strong>.
+                        Petugas akan memeriksa kondisi dan jumlah barang sebelum transaksi dinyatakan selesai.
+                    </div>
+                @elseif($transaksi->status_transaksi === 'Selesai' && $transaksi->pengembalian)
+                    <div class="card border-0 rounded-4 shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <div class="fw-bold mb-3 text-success"><i class="bi bi-check-circle me-2"></i>Hasil Pengembalian Barang</div>
+                            <div class="row g-3 small">
+                                <div class="col-sm-6">
+                                    <div class="text-muted">Tanggal dikembalikan</div>
+                                    <strong>{{ \Carbon\Carbon::parse($transaksi->pengembalian->tanggal_pengembalian_aktual)->format('d F Y') }}</strong>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="text-muted">Kondisi</div>
+                                    <strong>{{ $transaksi->pengembalian->kondisi_pengembalian }}</strong>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="text-muted">Baik</div>
+                                    <strong>{{ $transaksi->pengembalian->jumlah_baik }} unit</strong>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="text-muted">Rusak</div>
+                                    <strong>{{ $transaksi->pengembalian->jumlah_rusak }} unit</strong>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="text-muted">Hilang</div>
+                                    <strong>{{ $transaksi->pengembalian->jumlah_hilang }} unit</strong>
+                                </div>
+                                @if($transaksi->pengembalian->detailPengembalian->isNotEmpty())
+                                    <div class="col-12">
+                                        <div class="text-muted mb-2">Rincian per barang</div>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Barang</th>
+                                                        <th>Baik</th>
+                                                        <th>Rusak</th>
+                                                        <th>Hilang</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($transaksi->pengembalian->detailPengembalian as $detail)
+                                                        <tr>
+                                                            <td>{{ $detail->alatHiking->nama_alat }}</td>
+                                                            <td>{{ $detail->jumlah_baik }}</td>
+                                                            <td>{{ $detail->jumlah_rusak }}</td>
+                                                            <td>{{ $detail->jumlah_hilang }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                @endif
+                                @if($transaksi->pengembalian->denda > 0)
+                                    <div class="col-12 text-danger">
+                                        <div class="text-muted">Denda keterlambatan</div>
+                                        <strong>{{ formatRupiah($transaksi->pengembalian->denda) }}</strong>
+                                    </div>
+                                @endif
+                                @if($transaksi->pengembalian->catatan)
+                                    <div class="col-12">
+                                        <div class="text-muted">Catatan pemeriksaan</div>
+                                        <div>{{ $transaksi->pengembalian->catatan }}</div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 {{-- Cancel button --}}
                 @if($transaksi->status_transaksi == 'Pending')
                 <div class="card border-0 rounded-4 shadow-sm border-danger" style="border:2px solid #f8d7da!important;">
                     <div class="card-body p-4">
                         <h6 class="fw-bold text-danger mb-2"><i class="bi bi-exclamation-triangle me-2"></i>Batalkan Pesanan</h6>
                         <p class="text-muted small mb-3">Pesanan yang masih berstatus <strong>Pending</strong> dapat dibatalkan. Pesanan yang sudah disetujui tidak dapat dibatalkan.</p>
-                        <form action="{{ route('customer.transaksi.cancel', $transaksi->id_transaksi) }}" method="POST"
+                        <form action="{{ route('customer.transaksi.batalkan', $transaksi->id_transaksi) }}" method="POST"
                             onsubmit="return confirm('Yakin ingin membatalkan pesanan ini?')">
                             @csrf
                             @method('PATCH')
@@ -195,10 +271,104 @@
                         <hr>
                         <div class="d-flex justify-content-between fw-bold">
                             <span style="color:#173F35;">TOTAL</span>
-                            <span style="color:#173F35;font-size:1.1rem;">Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</span>
+                            <span style="color:#173F35;font-size:1.1rem;">Rp {{ number_format($transaksi->total_harga + $transaksi->denda, 0, ',', '.') }}</span>
                         </div>
                     </div>
                 </div>
+
+                @if($transaksi->status_transaksi === 'Disetujui')
+                    @if($transaksi->pembayaran?->status_pembayaran === 'Confirmed')
+                        <div class="alert alert-success border-0 rounded-3 mb-3">
+                            <i class="bi bi-check-circle me-2"></i>Pembayaran sudah berhasil dan dikonfirmasi.
+                        </div>
+                    @elseif($transaksi->pembayaran?->status_pembayaran === 'Pending')
+                        <div class="alert alert-info border-0 rounded-3 mb-3">
+                            <i class="bi bi-hourglass-split me-2"></i>
+                            @if($transaksi->pembayaran->bukti_pembayaran)
+                                Bukti pembayaran sudah dikirim dan sedang menunggu verifikasi admin.
+                            @else
+                                Pilihan pembayaran tunai sudah dicatat. Pembayaran dikonfirmasi saat pengambilan barang.
+                            @endif
+                        </div>
+                    @else
+                        <a href="{{ route('customer.payment.show', $transaksi->id_transaksi) }}" class="btn btn-brand w-100 py-3 fw-bold mb-3">
+                            <i class="bi bi-credit-card me-2"></i>
+                            {{ $transaksi->pembayaran?->status_pembayaran === 'Rejected' ? 'Perbaiki Pembayaran' : 'Lanjut ke Pembayaran' }}
+                        </a>
+                    @endif
+                @elseif($transaksi->status_transaksi === 'Pending')
+                    <div class="alert alert-info border-0 rounded-3 mb-3 small">
+                        <i class="bi bi-hourglass-split me-2"></i>Opsi pembayaran tersedia setelah pesanan disetujui admin.
+                    </div>
+                @endif
+
+                @if($transaksi->metode_pengambilan === 'Kirim via Kurir')
+                    <div class="card border-0 rounded-4 shadow-sm mb-3">
+                        <div class="card-body p-4">
+                            <div class="fw-bold mb-3" style="color:#173F35;">
+                                <i class="bi bi-truck me-2"></i>Pelacakan Pengiriman
+                            </div>
+                            @if($transaksi->alamat_pengiriman)
+                                <div class="small mb-3">
+                                    <div class="text-muted">Alamat tujuan</div>
+                                    <strong>{{ $transaksi->alamat_pengiriman }}</strong>
+                                </div>
+                            @endif
+
+                            @if($transaksi->pembayaran?->status_pembayaran !== 'Confirmed')
+                                <div class="alert alert-warning small mb-0">
+                                    Status pengiriman akan tersedia setelah pembayaran dikonfirmasi.
+                                </div>
+                            @else
+                                @php
+                                    $deliverySteps = ['Disiapkan', 'Dalam Perjalanan', 'Terkirim'];
+                                    $deliveryLabels = [
+                                        'Disiapkan' => 'Pesanan disiapkan',
+                                        'Dalam Perjalanan' => 'Kurir dalam perjalanan',
+                                        'Terkirim' => 'Pesanan sampai di lokasi',
+                                    ];
+                                    $deliveryIndex = array_search($transaksi->status_pengiriman, $deliverySteps, true);
+                                    $deliveryIndex = $deliveryIndex === false ? -1 : $deliveryIndex;
+                                @endphp
+                                <div class="small text-muted mb-3">
+                                    {{ $transaksi->status_pengiriman
+                                        ? $deliveryLabels[$transaksi->status_pengiriman]
+                                        : 'Pembayaran diterima; pesanan menunggu disiapkan.' }}
+                                </div>
+                                @foreach($deliverySteps as $stepIndex => $deliveryStep)
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                            style="width:32px;height:32px;background:{{ $stepIndex <= $deliveryIndex ? '#173F35' : '#e0e0e0' }};color:{{ $stepIndex <= $deliveryIndex ? 'white' : '#999' }};">
+                                            <i class="bi {{ $stepIndex <= $deliveryIndex ? 'bi-check-lg' : 'bi-circle' }} small"></i>
+                                        </div>
+                                        <div class="small {{ $stepIndex === $deliveryIndex ? 'fw-bold' : 'text-muted' }}">
+                                            {{ $deliveryLabels[$deliveryStep] }}
+                                            @if($deliveryStep === 'Dalam Perjalanan' && $transaksi->dikirim_pada)
+                                                <div class="text-muted fw-normal">{{ $transaksi->dikirim_pada->format('d/m/Y H:i') }}</div>
+                                            @elseif($deliveryStep === 'Terkirim' && $transaksi->diterima_pada)
+                                                <div class="text-muted fw-normal">{{ $transaksi->diterima_pada->format('d/m/Y H:i') }}</div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+
+                                @if($transaksi->nama_kurir || $transaksi->nomor_resi || $transaksi->telepon_kurir)
+                                    <div class="border-top pt-3 small">
+                                        @if($transaksi->nama_kurir)
+                                            <div><span class="text-muted">Kurir:</span> <strong>{{ $transaksi->nama_kurir }}</strong></div>
+                                        @endif
+                                        @if($transaksi->telepon_kurir)
+                                            <div><span class="text-muted">Telepon kurir:</span> <strong>{{ $transaksi->telepon_kurir }}</strong></div>
+                                        @endif
+                                        @if($transaksi->nomor_resi)
+                                            <div><span class="text-muted">Nomor resi:</span> <strong>{{ $transaksi->nomor_resi }}</strong></div>
+                                        @endif
+                                    </div>
+                                @endif
+                            @endif
+                        </div>
+                    </div>
+                @endif
 
                 {{-- Status Timeline --}}
                 <div class="card border-0 rounded-4 shadow-sm mb-3">
@@ -241,4 +411,3 @@
 </div>
 
 @endsection
-

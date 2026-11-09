@@ -4,6 +4,16 @@
 
 @section('content')
 
+@php
+    $hargaNormalPaket = $paket->detailPaket->sum(
+        fn ($detail) => ($detail->alatHiking?->harga_per_hari ?? 0) * $detail->jumlah_unit
+    );
+    $hematPaket = max(0, $hargaNormalPaket - $paket->harga_paket_per_hari);
+    $persenHematPaket = $hargaNormalPaket > 0
+        ? (int) round($hematPaket / $hargaNormalPaket * 100)
+        : 0;
+@endphp
+
 {{-- Breadcrumb --}}
 <div class="py-3" style="background:#f8faf9;">
     <div class="container">
@@ -22,8 +32,14 @@
         <div class="row g-5">
             {{-- Image & quick info --}}
             <div class="col-lg-5">
-                @if($paket->gambar)
-                    <img src="{{ Storage::url($paket->gambar) }}" alt="{{ $paket->nama_paket }}"
+                @php
+                    $paketImagePath = 'uploads/paket/' . basename($paket->gambar ?? '');
+                    $paketImageUrl = $paket->gambar && is_file(public_path($paketImagePath))
+                        ? asset($paketImagePath)
+                        : ($paket->gambar ? Storage::disk('public')->url($paket->gambar) : null);
+                @endphp
+                @if($paketImageUrl)
+                    <img src="{{ $paketImageUrl }}" alt="{{ $paket->nama_paket }}"
                         class="w-100 rounded-4 shadow-sm" style="height:380px;object-fit:cover;">
                 @else
                     <div class="rounded-4 d-flex align-items-center justify-content-center shadow-sm"
@@ -59,10 +75,20 @@
                 <h1 class="fw-bold mb-2" style="color:#173F35;font-size:2rem;">{{ $paket->nama_paket }}</h1>
                 <div class="mb-4">
                     <div class="text-muted small mb-1">Harga per hari</div>
+                    @if($hematPaket > 0)
+                        <div class="text-muted text-decoration-line-through small">
+                            {{ formatRupiah($hargaNormalPaket) }}/hari harga satuan
+                        </div>
+                    @endif
                     <div class="fw-bold" style="color:#173F35;font-size:2.2rem;">
                         Rp {{ number_format($paket->harga_paket_per_hari, 0, ',', '.') }}
                         <span class="text-muted fw-normal fs-6">/hari</span>
                     </div>
+                    @if($hematPaket > 0)
+                        <div class="text-success small fw-semibold mt-1">
+                            Hemat {{ formatRupiah($hematPaket) }}/hari ({{ $persenHematPaket }}%)
+                        </div>
+                    @endif
                 </div>
 
                 @if($paket->deskripsi)
@@ -121,7 +147,7 @@
 
                 {{-- CTA --}}
                 @auth
-                    <a href="{{ route('booking.create', ['paket' => $paket->id_paket]) }}" class="btn btn-brand btn-lg w-100 py-3 fw-bold">
+                    <a href="{{ route('booking.create', ['paket_id' => $paket->id_paket]) }}" class="btn btn-brand btn-lg w-100 py-3 fw-bold">
                         <i class="bi bi-bag-plus me-2"></i> Sewa Paket Ini
                     </a>
                 @else

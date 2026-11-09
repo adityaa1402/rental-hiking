@@ -13,18 +13,36 @@ class HomeController extends Controller
     public function index()
     {
         $setting = Pengaturan::getSetting();
-        $kategoriList = Kategori::withCount('alatHiking')->orderBy('id_kategori')->get();
-        $produkPopuler = AlatHiking::with('kategori')
+        $kategoriList = Kategori::withCount([
+            'alatHiking as alat_hiking_count' => fn ($query) => $query
+                ->withoutDuplicateListings()
+                ->where('kondisi', 'Baik'),
+        ])->orderBy('id_kategori')->get();
+        $produkPopuler = AlatHiking::withoutDuplicateListings()
+            ->with('kategori')
             ->where('kondisi', 'Baik')
             ->orderBy('id_alat')
             ->limit(6)
             ->get();
-        $paketList = PaketSewa::where('status_aktif', 1)
+        $paketList = PaketSewa::with('detailPaket.alatHiking')
+            ->where('status_aktif', 1)
             ->orderBy('harga_paket_per_hari')
             ->limit(4)
             ->get();
+        $paketDiskonTerbesar = 0;
 
-        return view('home', compact('setting', 'kategoriList', 'produkPopuler', 'paketList'));
+        foreach ($paketList as $paket) {
+            $hargaNormal = $paket->detailPaket->sum(
+                fn ($detail) => ($detail->alatHiking?->harga_per_hari ?? 0) * $detail->jumlah_unit
+            );
+
+            if ($hargaNormal > 0) {
+                $penghematan = max(0, $hargaNormal - $paket->harga_paket_per_hari);
+                $paketDiskonTerbesar = max($paketDiskonTerbesar, (int) round($penghematan / $hargaNormal * 100));
+            }
+        }
+
+        return view('home', compact('setting', 'kategoriList', 'produkPopuler', 'paketList', 'paketDiskonTerbesar'));
     }
 
     public function tentang()
@@ -60,4 +78,3 @@ class HomeController extends Controller
         return redirect()->route('kontak')->with('success', 'Pesan Anda berhasil dikirim!');
     }
 }
-

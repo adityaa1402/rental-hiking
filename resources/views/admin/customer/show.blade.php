@@ -6,7 +6,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
         <h4 class="fw-bold mb-1">{{ $customer->nama_lengkap }}</h4>
-        <small class="text-muted">ID: {{ $customer->id_user }} • Terdaftar: {{ \Carbon\Carbon::parse($customer->created_at)->format('d/m/Y') }}</small>
+        <small class="text-muted">ID: {{ $customer->id }} • Terdaftar: {{ \Carbon\Carbon::parse($customer->created_at)->format('d/m/Y') }}</small>
     </div>
     <a href="{{ route('admin.customer.index') }}" class="btn btn-outline-secondary btn-sm">
         <i class="bi bi-arrow-left me-1"></i> Kembali

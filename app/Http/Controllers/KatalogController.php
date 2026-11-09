@@ -12,7 +12,9 @@ class KatalogController extends Controller
     public function index(Request $request)
     {
         $setting = Pengaturan::getSetting();
-        $query = AlatHiking::with('kategori')->where('kondisi', 'Baik');
+        $query = AlatHiking::withoutDuplicateListings()
+            ->with('kategori', 'gallery')
+            ->where('kondisi', 'Baik');
 
         // Search
         if ($request->filled('q')) {
@@ -55,8 +57,9 @@ class KatalogController extends Controller
     public function show(string $slug)
     {
         $setting = Pengaturan::getSetting();
-        $alat = AlatHiking::with('kategori')->where('slug', $slug)->firstOrFail();
-        $related = AlatHiking::with('kategori')
+        $alat = AlatHiking::with('kategori', 'gallery')->where('slug', $slug)->firstOrFail();
+        $related = AlatHiking::withoutDuplicateListings()
+            ->with('kategori', 'gallery')
             ->where('id_kategori', $alat->id_kategori)
             ->where('id_alat', '!=', $alat->id_alat)
             ->where('kondisi', 'Baik')
@@ -66,4 +69,3 @@ class KatalogController extends Controller
         return view('katalog.show', compact('setting', 'alat', 'related'));
     }
 }
-

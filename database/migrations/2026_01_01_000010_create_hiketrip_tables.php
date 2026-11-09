@@ -133,10 +133,44 @@ return new class extends Migration
             $table->decimal('denda_keterlambatan_per_hari', 12, 2)->default(50000);
             $table->text('syarat_ketentuan')->nullable();
         });
+
+        // ========== PAYMENT SYSTEM ==========
+        Schema::create('pembayaran', function (Blueprint $table) {
+            $table->unsignedInteger('id_pembayaran')->autoIncrement();
+            $table->unsignedInteger('id_transaksi');
+
+            // Informasi Pembayaran
+            $table->decimal('jumlah', 12, 2)->default(0);
+            $table->enum('metode_pembayaran', ['Transfer Bank', 'E-Wallet', 'Tunai di Toko'])->default('Transfer Bank');
+            $table->enum('status_pembayaran', ['Pending', 'Confirmed', 'Rejected', 'Refunded'])->default('Pending');
+
+            // Bukti & Keterangan
+            $table->string('bukti_pembayaran', 255)->nullable();
+            $table->text('keterangan_pembayaran')->nullable();
+
+            // Verifikasi Admin
+            $table->unsignedBigInteger('dikonfirmasi_oleh')->nullable();
+            $table->text('catatan_admin')->nullable();
+            $table->dateTime('tanggal_dikonfirmasi')->nullable();
+
+            // Timestamps
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+
+            // Foreign Keys
+            $table->unique('id_transaksi');
+            $table->foreign('id_transaksi')->references('id_transaksi')->on('transaksi')->onDelete('cascade');
+            $table->foreign('dikonfirmasi_oleh')->references('id')->on('users')->onDelete('set null');
+
+            // Indexes
+            $table->index('status_pembayaran');
+            $table->index('created_at');
+        });
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('pembayaran');
         Schema::dropIfExists('dokumen_jaminan');
         Schema::dropIfExists('pengembalian');
         Schema::dropIfExists('detail_transaksi');
@@ -148,4 +182,3 @@ return new class extends Migration
         Schema::dropIfExists('pengaturan');
     }
 };
-

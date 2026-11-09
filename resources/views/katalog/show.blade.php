@@ -3,9 +3,7 @@
 @php
     $shopSettings = getShopSettings();
     $avail = getItemAvailability($alat->id_alat);
-    $imgSrc = file_exists(public_path('uploads/barang/' . $alat->gambar)) 
-        ? asset('uploads/barang/' . $alat->gambar) 
-        : asset('assets/images/logo.svg');
+    $imgSrc = getProductImageUrl($alat);
 @endphp
 
 @section('content')
@@ -35,10 +33,42 @@
         <div class="row g-4 mb-5">
             <!-- Gambar Produk -->
             <div class="col-lg-6">
-                <div class="card border-0 shadow-sm rounded-4 overflow-hidden p-2 bg-white">
-                    <img src="{{ $imgSrc }}" alt="{{ $alat->nama_alat }}" class="img-fluid rounded-3 w-100" style="max-height: 440px; object-fit: cover;">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden p-2 bg-white mb-3">
+                    <img src="{{ $imgSrc }}" alt="{{ $alat->nama_alat }}" class="img-fluid rounded-3 w-100" style="max-height: 440px; object-fit: cover;" id="mainImage">
                 </div>
-                <div class="d-flex align-items-center gap-3 mt-3 p-3 bg-white rounded-3 border">
+
+                <!-- Gallery Thumbnails -->
+                @if($alat->gallery->count() > 0)
+                    <div class="d-flex gap-2 mb-3 overflow-auto pb-2">
+                        @foreach($alat->gallery as $photo)
+                            @php
+                                $thumbPath = ltrim(str_replace('\\', '/', $photo->gambar), '/');
+                                $thumbSrc = null;
+
+                                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($thumbPath)) {
+                                    $thumbSrc = \Illuminate\Support\Facades\Storage::disk('public')->url($thumbPath);
+                                } elseif (is_file(public_path($thumbPath))) {
+                                    $thumbSrc = asset($thumbPath);
+                                } else {
+                                    $uploadPath = 'uploads/barang/' . basename($thumbPath);
+                                    if (is_file(public_path($uploadPath))) {
+                                        $thumbSrc = asset($uploadPath);
+                                    }
+                                }
+                            @endphp
+                            @if($thumbSrc)
+                                <button type="button"
+                                        class="gallery-thumb rounded-3 border-2 flex-shrink-0 {{ $photo->urutan == 0 ? 'border-success' : 'border-light' }}"
+                                        onclick="changeImage('{{ $thumbSrc }}')"
+                                        style="width: 80px; height: 80px; padding: 2px; background: none; cursor: pointer; overflow: hidden;">
+                                    <img src="{{ $thumbSrc }}" alt="{{ $alat->nama_alat }}" class="w-100 h-100 rounded-2" style="object-fit: cover;">
+                                </button>
+                            @endif
+                        @endforeach
+                    </div>
+                @endif
+
+                <div class="d-flex align-items-center gap-3 p-3 bg-white rounded-3 border">
                     <i class="bi bi-shield-check text-success fs-3"></i>
                     <div class="small">
                         <strong>Jaminan Kualitas & Kebersihan:</strong> Seluruh peralatan diperiksa frame, resleting, dan kainnya serta melalui proses pencucian higienis setelah setiap pemakaian.
@@ -173,9 +203,7 @@
                     @foreach($related as $rel)
                         @php
                             $relAvail = getItemAvailability($rel->id_alat);
-                            $relImg = file_exists(public_path('uploads/barang/' . $rel->gambar)) 
-                                ? asset('uploads/barang/' . $rel->gambar) 
-                                : asset('assets/images/logo.svg');
+                            $relImg = getProductImageUrl($rel);
                         @endphp
                         <div class="col-md-4">
                             <div class="gear-card">
@@ -249,6 +277,11 @@ document.getElementById('metode_pengambilan').addEventListener('change', hitungE
 
 // Initial calculation
 hitungEstimasi();
+
+// Gallery image change
+function changeImage(imageSrc) {
+    document.getElementById('mainImage').src = imageSrc;
+}
 </script>
 @endpush
 @endsection

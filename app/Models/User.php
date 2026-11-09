@@ -12,8 +12,9 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $table = 'users';
-    protected $primaryKey = 'id_user';
+    protected $primaryKey = 'id';
     public $incrementing = true;
+    public $keyType = 'int';
 
     protected $fillable = [
         'nama_lengkap', 'email', 'no_hp', 'password', 'role', 'alamat',
@@ -31,7 +32,7 @@ class User extends Authenticatable
 
     public function transaksi(): HasMany
     {
-        return $this->hasMany(Transaksi::class, 'id_user', 'id_user');
+        return $this->hasMany(Transaksi::class, 'id_user', 'id');
     }
 
     public function isAdmin(): bool

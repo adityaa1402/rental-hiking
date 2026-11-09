@@ -10,7 +10,8 @@ class PaketController extends Controller
     public function index()
     {
         $setting = Pengaturan::getSetting();
-        $packages = PaketSewa::where('status_aktif', 1)
+        $packages = PaketSewa::with('detailPaket.alatHiking')
+            ->where('status_aktif', 1)
             ->orderBy('harga_paket_per_hari')
             ->get();
 
@@ -28,4 +29,3 @@ class PaketController extends Controller
         return view('paket.show', compact('setting', 'paket'));
     }
 }
-

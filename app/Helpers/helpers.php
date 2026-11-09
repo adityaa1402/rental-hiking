@@ -118,7 +118,7 @@ if (!function_exists('getItemAvailability')) {
      * LOGIKA STOK & KETERSEDIAAN:
      * Menghitung sisa stok barang yang benar-benar siap disewa pada rentang tanggal tertentu.
      * 
-     * Sisa = Stok Total Fisik (kondisi 'Baik') - Unit teralokasi pada transaksi 'Disetujui' dan 'Berjalan'
+     * Sisa = Stok fisik layak sewa - Unit teralokasi pada transaksi 'Disetujui' dan 'Berjalan'
      * yang periode sewanya bertabrakan (overlap) dengan tanggal yang diinginkan.
      * Rumus Overlap: (tgl_sewa <= $endDate) AND (tgl_kembali >= $startDate)
      * 
@@ -126,22 +126,28 @@ if (!function_exists('getItemAvailability')) {
      * @param string|null $startDate (Format Y-m-d)
      * @param string|null $endDate (Format Y-m-d)
      * @param int|null $excludeTransactionId (Digunakan saat edit/persetujuan transaksi tertentu)
-     * @return array ['stok_total' => int, 'stok_terpakai' => int, 'sisa_stok' => int, 'kondisi' => string]
+     * @return array ['stok_total' => int, 'stok_rusak' => int, 'stok_terpakai' => int, 'sisa_stok' => int, 'kondisi' => string]
      */
     function getItemAvailability(int $id_alat, ?string $startDate = null, ?string $endDate = null, ?int $excludeTransactionId = null): array
     {
         $item = \App\Models\AlatHiking::find($id_alat);
         
         if (!$item) {
-            return ['stok_total' => 0, 'stok_terpakai' => 0, 'sisa_stok' => 0, 'kondisi' => 'Tidak Ditemukan'];
+            return ['stok_total' => 0, 'stok_rusak' => 0, 'stok_terpakai' => 0, 'sisa_stok' => 0, 'kondisi' => 'Tidak Ditemukan'];
         }
         
-        $stokTotal = (int)$item->stok_total;
+        $stokTotal = max(0, (int) $item->stok_total - (int) $item->stok_rusak);
         $kondisi = $item->kondisi;
         
         // Jika kondisi bukan 'Baik', alat tidak bisa disewakan
         if ($kondisi !== 'Baik') {
-            return ['stok_total' => $stokTotal, 'stok_terpakai' => 0, 'sisa_stok' => 0, 'kondisi' => $kondisi];
+            return [
+                'stok_total' => (int) $item->stok_total,
+                'stok_rusak' => (int) $item->stok_rusak,
+                'stok_terpakai' => 0,
+                'sisa_stok' => 0,
+                'kondisi' => $kondisi,
+            ];
         }
         
         // Jika tanggal sewa tidak ditentukan, ambil peminjaman aktif saat ini (hari ini)
@@ -166,7 +172,8 @@ if (!function_exists('getItemAvailability')) {
         $sisaStok = max(0, $stokTotal - $terpakai);
         
         return [
-            'stok_total'    => $stokTotal,
+            'stok_total'    => (int) $item->stok_total,
+            'stok_rusak'    => (int) $item->stok_rusak,
             'stok_terpakai' => $terpakai,
             'sisa_stok'     => $sisaStok,
             'kondisi'       => $kondisi
@@ -233,5 +240,45 @@ if (!function_exists('renderStatusBadge')) {
             default:
                 return '<span class="badge bg-secondary px-3 py-2">' . e($status) . '</span>';
         }
+    }
+}
+
+if (!function_exists('getProductImageUrl')) {
+    /**
+     * Get product image URL from gallery
+     * Handles storage disk properly
+     */
+    function getProductImageUrl($item): string
+    {
+        if (!$item || !isset($item->id_alat)) {
+            return asset('assets/images/logo.svg');
+        }
+
+        $gallery = \App\Models\BarangGallery::where('id_alat', $item->id_alat)
+            ->orderBy('urutan')
+            ->first();
+
+        foreach ([$item->gambar, $gallery?->gambar] as $image) {
+            if (!$image) {
+                continue;
+            }
+
+            $image = ltrim(str_replace('\\', '/', $image), '/');
+
+            if (is_file(public_path($image))) {
+                return asset($image);
+            }
+
+            $uploadPath = 'uploads/barang/' . basename($image);
+            if (is_file(public_path($uploadPath))) {
+                return asset($uploadPath);
+            }
+
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($image)) {
+                return \Illuminate\Support\Facades\Storage::disk('public')->url($image);
+            }
+        }
+
+        return asset('assets/images/logo.svg');
     }
 }

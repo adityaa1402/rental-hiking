@@ -57,9 +57,6 @@
                         <span class="badge bg-warning text-dark">{{ $pendingCount }}</span>
                     @endif
                 </a>
-                <a class="nav-link {{ request()->routeIs('admin.pengembalian.*') ? 'active' : '' }}" href="{{ route('admin.pengembalian.index') }}">
-                    <i class="bi bi-arrow-return-left"></i> Pengembalian
-                </a>
                 <a class="nav-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}" href="{{ route('admin.laporan.index') }}">
                     <i class="bi bi-file-earmark-bar-graph"></i> Laporan
                 </a>
@@ -123,7 +120,6 @@
                         <a class="nav-link" href="{{ route('admin.paket.index') }}"><i class="bi bi-boxes"></i> Paket Sewa</a>
                         <a class="nav-link" href="{{ route('admin.customer.index') }}"><i class="bi bi-people"></i> Customer</a>
                         <a class="nav-link" href="{{ route('admin.transaksi.index') }}"><i class="bi bi-receipt"></i> Transaksi</a>
-                        <a class="nav-link" href="{{ route('admin.pengembalian.index') }}"><i class="bi bi-arrow-return-left"></i> Pengembalian</a>
                         <a class="nav-link" href="{{ route('admin.laporan.index') }}"><i class="bi bi-file-earmark-bar-graph"></i> Laporan</a>
                         <a class="nav-link" href="{{ route('admin.pengaturan.index') }}"><i class="bi bi-gear"></i> Pengaturan</a>
                         <hr class="border-secondary">
@@ -166,4 +162,3 @@
 @stack('scripts')
 </body>
 </html>
-

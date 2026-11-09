@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pengembalian extends Model
 {
@@ -21,5 +22,9 @@ class Pengembalian extends Model
     {
         return $this->belongsTo(Transaksi::class, 'id_transaksi', 'id_transaksi');
     }
-}
 
+    public function detailPengembalian(): HasMany
+    {
+        return $this->hasMany(DetailPengembalian::class, 'id_pengembalian', 'id_pengembalian');
+    }
+}

@@ -30,9 +30,13 @@ class AuthController extends Controller
             $user = Auth::user();
 
             if ($user->isAdmin()) {
-                return redirect()->route('admin.dashboard')->with('success', 'Selamat datang, ' . $user->nama_lengkap . '!');
+                return redirect()->intended(route('admin.dashboard'))
+                    ->with('success', 'Selamat datang, ' . $user->nama_lengkap . '!');
             }
-            return redirect()->route('customer.dashboard')->with('success', 'Selamat datang, ' . $user->nama_lengkap . '!');
+            $request->session()->forget('url.intended');
+
+            return redirect()->route('customer.dashboard')
+                ->with('success', 'Selamat datang, ' . $user->nama_lengkap . '!');
         }
 
         return back()->withErrors(['email' => 'Email atau password yang Anda masukkan salah.'])->withInput($request->only('email'));
@@ -69,10 +73,7 @@ class AuthController extends Controller
             'alamat'       => $request->alamat,
         ]);
 
-        Auth::login($user);
-        $request->session()->regenerate();
-
-        return redirect()->route('customer.dashboard')->with('success', 'Akun berhasil dibuat! Selamat datang, ' . $user->nama_lengkap . '.');
+        return redirect()->route('login')->with('success', 'Akun berhasil dibuat! Silakan login dengan email dan password Anda.');
     }
 
     public function logout(Request $request)
@@ -83,4 +84,3 @@ class AuthController extends Controller
         return redirect()->route('login')->with('success', 'Anda telah berhasil logout.');
     }
 }
-

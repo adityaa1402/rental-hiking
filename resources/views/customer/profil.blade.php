@@ -102,20 +102,20 @@
                             <div class="row g-3">
                                 <div class="col-12">
                                     <label class="form-label small fw-semibold text-muted">Password Lama *</label>
-                                    <input type="password" name="current_password" class="form-control @error('current_password') is-invalid @enderror"
+                                    <input type="password" name="password_lama" class="form-control @error('password_lama') is-invalid @enderror"
                                         placeholder="Password saat ini">
-                                    @error('current_password')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+                                    @error('password_lama')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label small fw-semibold text-muted">Password Baru *</label>
                                     <input type="password" name="password" class="form-control @error('password') is-invalid @enderror"
-                                        placeholder="Min. 8 karakter">
+                                        placeholder="Min. 8 karakter" minlength="8">
                                     @error('password')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label small fw-semibold text-muted">Konfirmasi Password Baru *</label>
                                     <input type="password" name="password_confirmation" class="form-control"
-                                        placeholder="Ulangi password baru">
+                                        placeholder="Ulangi password baru (min. 8 karakter)" minlength="8">
                                 </div>
                                 <div class="col-12">
                                     <button type="submit" class="btn btn-outline-danger px-4 py-2">
@@ -133,4 +133,3 @@
 </div>
 
 @endsection
-

@@ -13,7 +13,7 @@ class TransaksiController extends Controller
     {
         $setting = Pengaturan::getSetting();
         $user = auth()->user();
-        $query = Transaksi::where('id_user', $user->id_user)
+        $query = Transaksi::where('id_user', $user->id)
             ->with('detailTransaksi')
             ->orderByDesc('id_transaksi');
 
@@ -29,8 +29,13 @@ class TransaksiController extends Controller
     public function show(int $id)
     {
         $setting = Pengaturan::getSetting();
-        $transaksi = Transaksi::with(['detailTransaksi.alatHiking', 'pengembalian', 'dokumenJaminan'])
-            ->where('id_user', auth()->user()->id_user)
+        $transaksi = Transaksi::with([
+            'detailTransaksi.alatHiking',
+            'pengembalian.detailPengembalian.alatHiking',
+            'dokumenJaminan',
+            'pembayaran',
+        ])
+            ->where('id_user', auth()->user()->id)
             ->where('id_transaksi', $id)
             ->firstOrFail();
 
@@ -39,7 +44,7 @@ class TransaksiController extends Controller
 
     public function batalkan(Request $request, int $id)
     {
-        $transaksi = Transaksi::where('id_user', auth()->user()->id_user)
+        $transaksi = Transaksi::where('id_user', auth()->user()->id)
             ->where('id_transaksi', $id)
             ->where('status_transaksi', 'Pending')
             ->firstOrFail();
@@ -50,4 +55,3 @@ class TransaksiController extends Controller
             ->with('success', 'Transaksi berhasil dibatalkan.');
     }
 }
-

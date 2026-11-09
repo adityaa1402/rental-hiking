@@ -49,7 +49,7 @@
                             <span class="badge bg-info">{{ $customer->transaksi_count }}</span>
                         </td>
                         <td class="text-end pe-4">
-                            <a href="{{ route('admin.customer.show', $customer->id_user) }}" class="btn btn-outline-primary btn-sm">
+                            <a href="{{ route('admin.customer.show', $customer->id) }}" class="btn btn-outline-primary btn-sm">
                                 <i class="bi bi-eye me-1"></i> Detail
                             </a>
                         </td>

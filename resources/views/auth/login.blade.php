@@ -64,12 +64,6 @@
                     </div>
                 </div>
 
-                <!-- Demo Credentials -->
-                <div class="card border-0 bg-white bg-opacity-50 rounded-4 p-3 mt-3 small text-center text-muted">
-                    <strong>Demo Login:</strong><br>
-                    <strong>Admin:</strong> admin@hikettrip.com / admin123<br>
-                    <strong>Customer:</strong> customer@hikettrip.com / customer123
-                </div>
             </div>
         </div>
     </div>

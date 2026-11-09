@@ -19,18 +19,21 @@ class Transaksi extends Model
         'kode_transaksi', 'id_user', 'tgl_sewa', 'tgl_kembali', 'total_hari',
         'subtotal', 'biaya_pengiriman', 'diskon', 'denda', 'total_harga',
         'metode_pengambilan', 'alamat_pengiriman', 'status_transaksi',
-        'catatan_admin', 'catatan_customer',
+        'catatan_admin', 'catatan_customer', 'status_pengiriman',
+        'nama_kurir', 'telepon_kurir', 'nomor_resi', 'dikirim_pada', 'diterima_pada',
     ];
 
     protected $casts = [
         'tgl_sewa'    => 'date',
         'tgl_kembali' => 'date',
         'created_at'  => 'datetime',
+        'dikirim_pada' => 'datetime',
+        'diterima_pada' => 'datetime',
     ];
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'id_user', 'id_user');
+        return $this->belongsTo(User::class, 'id_user', 'id');
     }
 
     public function detailTransaksi(): HasMany
@@ -46,6 +49,11 @@ class Transaksi extends Model
     public function dokumenJaminan(): HasMany
     {
         return $this->hasMany(DokumenJaminan::class, 'id_transaksi', 'id_transaksi');
+    }
+
+    public function pembayaran(): HasOne
+    {
+        return $this->hasOne(Pembayaran::class, 'id_transaksi', 'id_transaksi');
     }
 
     /**
@@ -72,4 +80,3 @@ class Transaksi extends Model
         };
     }
 }
-
