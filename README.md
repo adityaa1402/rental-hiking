@@ -20,5 +20,6 @@ php artisan route:list
 
 ## Dokumentasi
 
+- [Product Requirements Document (PRD)](./docs/PRD_HIKETRIP_RENTAL.md) — kebutuhan, ruang lingkup, alur, aturan bisnis, data, dan pengujian berdasarkan implementasi repository.
 - [Panduan Penggunaan dan Alur Rental](./PANDUAN_PENGGUNA.md) — setup, alur transaksi, dan troubleshooting.
 - [Kredit Foto Produk](./PHOTO_CREDITS.md) — sumber foto katalog.
