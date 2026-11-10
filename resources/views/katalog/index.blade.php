@@ -27,7 +27,7 @@
         <div class="row g-4">
             <!-- Sidebar Filter -->
             <div class="col-lg-3">
-                <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 90px; z-index: 5;">
+                <div class="card border-0 shadow-sm rounded-4 p-4 sticky-panel">
                     <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
                         <h6 class="fw-bold mb-0"><i class="bi bi-funnel-fill text-warning me-2"></i>Filter Pencarian</h6>
                         <a href="{{ route('katalog.index') }}" class="small text-muted text-decoration-none">Reset</a>

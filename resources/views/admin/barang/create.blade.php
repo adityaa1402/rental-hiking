@@ -121,7 +121,7 @@
 
         <!-- Sidebar: Gambar -->
         <div class="col-lg-4">
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white sticky-top" style="top:20px;">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white sticky-panel">
                 <h6 class="fw-bold mb-3 border-bottom pb-2" style="color:#173F35;">Foto Barang</h6>
                 
                 <div class="mb-3">

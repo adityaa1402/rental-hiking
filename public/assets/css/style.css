@@ -19,6 +19,7 @@
     --text-dark: #202923;
     --text-muted: #5e6d63;
     --border-color: #e2e8e2;
+    --sticky-panel-top: 6rem;
     --card-shadow: 0 10px 25px -5px rgba(16, 45, 39, 0.08), 0 8px 10px -6px rgba(16, 45, 39, 0.04);
     --hover-shadow: 0 20px 30px -10px rgba(23, 63, 53, 0.18);
 }
@@ -121,6 +122,20 @@ h1, h2, h3, .heading-font {
 .navbar-custom .nav-link:hover, .navbar-custom .nav-link.active {
     color: #ffffff;
     background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Keep sidebar cards below the sticky navigation and disable them on narrow/short screens. */
+.sticky-panel {
+    position: sticky;
+    top: var(--sticky-panel-top);
+    z-index: 5;
+    align-self: flex-start;
+}
+
+@media (max-width: 991.98px), (max-height: 700px) {
+    .sticky-panel {
+        position: static;
+    }
 }
 
 /* Hero Section */
@@ -369,4 +384,3 @@ footer a:hover {
         padding-bottom: 10px;
     }
 }
-

@@ -45,21 +45,33 @@
                     }
                     
                     $hemat = max(0, $normalTotal - $pkg->harga_paket_per_hari);
-                    $imgSrc = file_exists(public_path('uploads/paket/' . $pkg->gambar)) 
-                        ? asset('uploads/paket/' . $pkg->gambar) 
-                        : asset('assets/images/logo.svg');
+                    $gambarPromosiPaket = [
+                        'paket-hemat-pendaki-solo' => 'paket-hemat-solo.png',
+                        'paket-hemat-berdua' => 'paket-hemat-berdua.png',
+                        'paket-hemat-keluarga' => 'paket-hemat-keluarga.png',
+                        'paket-hemat-rombongan-4-orang' => 'paket-hemat-rombongan.png',
+                    ][$pkg->slug] ?? null;
+                    $isPromotionalPackage = $gambarPromosiPaket !== null;
+                    $imgSrc = $gambarPromosiPaket
+                        ? asset('assets/images/' . $gambarPromosiPaket)
+                        : (file_exists(public_path('uploads/paket/' . $pkg->gambar))
+                            ? asset('uploads/paket/' . $pkg->gambar)
+                            : asset('assets/images/logo.svg'));
                 @endphp
                 
                 <div class="col-lg-6">
                     <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 bg-white d-flex flex-column">
                         <div class="row g-0 flex-grow-1">
-                            <div class="col-md-5 position-relative">
-                                <img src="{{ $imgSrc }}" alt="{{ $pkg->nama_paket }}" class="w-100 h-100" style="object-fit: cover; min-height: 250px;">
-                                <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 px-3 py-2 fw-bold">
-                                    <i class="bi bi-people-fill me-1"></i> Kapasitas {{ $pkg->kapasitas_orang }} Orang
-                                </span>
+                            <div class="{{ $isPromotionalPackage ? 'col-12' : 'col-md-5' }} position-relative">
+                                <img src="{{ $imgSrc }}" alt="{{ $pkg->nama_paket }}" class="w-100 {{ $isPromotionalPackage ? '' : 'h-100' }}"
+                                    style="{{ $isPromotionalPackage ? 'height: auto; max-height: 420px; aspect-ratio: 4 / 3; object-fit: contain; background: #173F35;' : 'object-fit: cover; min-height: 250px;' }}">
+                                @unless($isPromotionalPackage)
+                                    <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 px-3 py-2 fw-bold">
+                                        <i class="bi bi-people-fill me-1"></i> Kapasitas {{ $pkg->kapasitas_orang }} Orang
+                                    </span>
+                                @endunless
                             </div>
-                            <div class="col-md-7 p-4 d-flex flex-column justify-content-between">
+                            <div class="{{ $isPromotionalPackage ? 'col-12' : 'col-md-7' }} p-4 d-flex flex-column justify-content-between">
                                 <div>
                                     <h4 class="fw-bold mb-2">{{ $pkg->nama_paket }}</h4>
                                     <p class="text-muted small mb-3">{{ $pkg->deskripsi }}</p>

@@ -50,7 +50,7 @@
         <div class="row g-4">
             <!-- Transaksi Summary (Sticky) -->
             <div class="col-lg-4 order-lg-2">
-                <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 90px;">
+                <div class="card border-0 shadow-sm rounded-4 p-4 sticky-panel">
                     <h5 class="fw-bold mb-3"><i class="bi bi-receipt text-success me-2"></i>Detail Transaksi</h5>
 
                     <!-- Kode Transaksi -->

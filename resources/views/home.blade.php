@@ -223,13 +223,22 @@
                             );
                             $hemat = max(0, $hargaNormal - $paket->harga_paket_per_hari);
                             $gambarPaketPath = 'uploads/paket/' . basename($paket->gambar ?? '');
-                            $gambarPaketUrl = $paket->gambar && is_file(public_path($gambarPaketPath))
-                                ? asset($gambarPaketPath)
-                                : ($paket->gambar ? asset('storage/' . $paket->gambar) : asset('assets/images/logo.svg'));
+                            $gambarPromosiPaket = [
+                                'paket-hemat-pendaki-solo' => 'paket-hemat-solo.png',
+                                'paket-hemat-berdua' => 'paket-hemat-berdua.png',
+                                'paket-hemat-keluarga' => 'paket-hemat-keluarga.png',
+                                'paket-hemat-rombongan-4-orang' => 'paket-hemat-rombongan.png',
+                            ][$paket->slug] ?? null;
+                            $gambarPaketUrl = $gambarPromosiPaket
+                                ? asset('assets/images/' . $gambarPromosiPaket)
+                                : ($paket->gambar && is_file(public_path($gambarPaketPath))
+                                    ? asset($gambarPaketPath)
+                                    : ($paket->gambar ? asset('storage/' . $paket->gambar) : asset('assets/images/logo.svg')));
                         @endphp
                         <div class="col-md-6 col-xl-3">
                             <article class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">
-                                <img src="{{ $gambarPaketUrl }}" alt="{{ $paket->nama_paket }}" class="w-100" style="height: 170px; object-fit: cover;">
+                                <img src="{{ $gambarPaketUrl }}" alt="{{ $paket->nama_paket }}" class="w-100"
+                                    style="{{ $gambarPromosiPaket ? 'height: auto; aspect-ratio: 4 / 3; object-fit: contain; background: #173F35;' : 'height: 170px; object-fit: cover;' }}">
                                 <div class="card-body d-flex flex-column">
                                     <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
                                         <h5 class="fw-bold mb-0">{{ $paket->nama_paket }}</h5>

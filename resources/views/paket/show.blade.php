@@ -34,13 +34,23 @@
             <div class="col-lg-5">
                 @php
                     $paketImagePath = 'uploads/paket/' . basename($paket->gambar ?? '');
-                    $paketImageUrl = $paket->gambar && is_file(public_path($paketImagePath))
-                        ? asset($paketImagePath)
-                        : ($paket->gambar ? Storage::disk('public')->url($paket->gambar) : null);
+                    $gambarPromosiPaket = [
+                        'paket-hemat-pendaki-solo' => 'paket-hemat-solo.png',
+                        'paket-hemat-berdua' => 'paket-hemat-berdua.png',
+                        'paket-hemat-keluarga' => 'paket-hemat-keluarga.png',
+                        'paket-hemat-rombongan-4-orang' => 'paket-hemat-rombongan.png',
+                    ][$paket->slug] ?? null;
+                    $isPromotionalPackage = $gambarPromosiPaket !== null;
+                    $paketImageUrl = $gambarPromosiPaket
+                        ? asset('assets/images/' . $gambarPromosiPaket)
+                        : ($paket->gambar && is_file(public_path($paketImagePath))
+                            ? asset($paketImagePath)
+                            : ($paket->gambar ? Storage::disk('public')->url($paket->gambar) : null));
                 @endphp
                 @if($paketImageUrl)
                     <img src="{{ $paketImageUrl }}" alt="{{ $paket->nama_paket }}"
-                        class="w-100 rounded-4 shadow-sm" style="height:380px;object-fit:cover;">
+                        class="w-100 rounded-4 shadow-sm"
+                        style="{{ $isPromotionalPackage ? 'height:auto;aspect-ratio:4 / 3;object-fit:contain;background:#173F35;' : 'height:380px;object-fit:cover;' }}">
                 @else
                     <div class="rounded-4 d-flex align-items-center justify-content-center shadow-sm"
                         style="height:380px;background:linear-gradient(135deg,#173F35,#2d6a4f);">
@@ -166,4 +176,3 @@
 </section>
 
 @endsection
-
