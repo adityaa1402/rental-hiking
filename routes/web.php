@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\PengaturanController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\BarangGalleryController;
+use App\Http\Controllers\Admin\PesanKontakController;
 use App\Http\Controllers\ImageSetupController;
 use Illuminate\Support\Facades\Route;
 
@@ -116,6 +117,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin', 'admin
     // Customer
     Route::get('/customer', [CustomerController::class, 'index'])->name('customer.index');
     Route::get('/customer/{id}', [CustomerController::class, 'show'])->name('customer.show');
+
+    // Pesan Kontak
+    Route::get('/pesan', [PesanKontakController::class, 'index'])->name('pesan.index');
+    Route::get('/pesan/{id}', [PesanKontakController::class, 'show'])->name('pesan.show');
 
     // Laporan
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');

@@ -21,7 +21,7 @@
     <div class="col-lg-5">
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white mb-4">
             @if($barang->gambar)
-                <img src="{{ Storage::url('barang/' . $barang->gambar) }}" class="card-img-top" style="height:400px;object-fit:cover;">
+                <img src="{{ getProductImageUrl($barang) }}" alt="{{ $barang->nama_alat }}" class="card-img-top" style="height:400px;object-fit:cover;">
             @else
                 <div class="d-flex align-items-center justify-content-center bg-light" style="height:400px;">
                     <div class="text-center">

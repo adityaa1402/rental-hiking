@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pengaturan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class ProfilController extends Controller
@@ -20,13 +21,14 @@ class ProfilController extends Controller
     public function update(Request $request)
     {
         $user = auth()->user();
-        $request->validate([
+        $validated = $request->validate([
             'nama_lengkap' => 'required|string|max:100',
+            'email'        => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'no_hp'        => 'required|string|max:25',
             'alamat'       => 'nullable|string',
         ]);
 
-        $user->update($request->only('nama_lengkap', 'no_hp', 'alamat'));
+        $user->update($validated);
         return back()->with('success', 'Profil berhasil diperbarui.');
     }
 
@@ -46,4 +48,3 @@ class ProfilController extends Controller
         return back()->with('success', 'Password berhasil diubah.');
     }
 }
-

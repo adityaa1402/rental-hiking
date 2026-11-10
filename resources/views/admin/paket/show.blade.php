@@ -63,11 +63,11 @@
                             @foreach($paket->detailPaket as $detail)
                                 <tr>
                                     <td>
-                                        <div class="fw-bold">{{ $detail->alatHiking->nama_barang ?? 'N/A' }}</div>
+                                        <div class="fw-bold">{{ $detail->alatHiking->nama_alat ?? 'N/A' }}</div>
                                         <small class="text-muted">{{ $detail->alatHiking->merk ?? '' }}</small>
                                     </td>
                                     <td class="text-center">{{ $detail->jumlah_unit }}</td>
-                                    <td class="text-end">{{ formatRupiah($detail->alatHiking->harga_sewa_perhari ?? 0) }}</td>
+                                    <td class="text-end">{{ formatRupiah($detail->alatHiking->harga_per_hari ?? 0) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -85,7 +85,7 @@
         <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
             <h6 class="fw-bold mb-3 border-bottom pb-2">Gambar Paket</h6>
             @if($paket->gambar)
-                <img src="{{ asset('uploads/paket/' . $paket->gambar) }}" alt="{{ $paket->nama_paket }}" class="img-fluid rounded mb-3" style="max-height:250px;object-fit:cover;">
+                <img src="{{ getPackageImageUrl($paket) }}" alt="{{ $paket->nama_paket }}" class="img-fluid rounded mb-3" style="max-height:250px;object-fit:cover;">
             @else
                 <div class="alert alert-info small">Tidak ada gambar</div>
             @endif

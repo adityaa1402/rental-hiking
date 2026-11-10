@@ -54,9 +54,7 @@
                     $isPromotionalPackage = $gambarPromosiPaket !== null;
                     $imgSrc = $gambarPromosiPaket
                         ? asset('assets/images/' . $gambarPromosiPaket)
-                        : (file_exists(public_path('uploads/paket/' . $pkg->gambar))
-                            ? asset('uploads/paket/' . $pkg->gambar)
-                            : asset('assets/images/logo.svg'));
+                        : getPackageImageUrl($pkg);
                 @endphp
                 
                 <div class="col-lg-6">

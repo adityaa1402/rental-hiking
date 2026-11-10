@@ -45,7 +45,11 @@
                             <label class="form-label small fw-semibold">Kata Sandi</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light text-muted"><i class="bi bi-lock"></i></span>
-                                <input type="password" name="password" class="form-control" placeholder="Masukkan password" required>
+                                <input type="password" name="password" id="login-password" class="form-control" placeholder="Masukkan password" autocomplete="current-password" required>
+                                <button type="button" class="btn btn-outline-secondary" id="toggle-login-password"
+                                    aria-label="Tampilkan password" aria-pressed="false" aria-controls="login-password">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
+                                </button>
                             </div>
                         </div>
 
@@ -69,3 +73,22 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    const loginPassword = document.getElementById('login-password');
+    const toggleLoginPassword = document.getElementById('toggle-login-password');
+
+    toggleLoginPassword.addEventListener('click', () => {
+        const isPasswordVisible = loginPassword.type === 'text';
+
+        loginPassword.type = isPasswordVisible ? 'password' : 'text';
+        toggleLoginPassword.setAttribute('aria-pressed', String(!isPasswordVisible));
+        toggleLoginPassword.setAttribute(
+            'aria-label',
+            isPasswordVisible ? 'Tampilkan password' : 'Sembunyikan password'
+        );
+        toggleLoginPassword.innerHTML = `<i class="bi ${isPasswordVisible ? 'bi-eye' : 'bi-eye-slash'}" aria-hidden="true"></i>`;
+    });
+</script>
+@endpush

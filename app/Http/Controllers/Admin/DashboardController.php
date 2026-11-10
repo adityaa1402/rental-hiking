@@ -17,8 +17,8 @@ class DashboardController extends Controller
 
         // Stats untuk cards
         $stats = [
-            'total_barang' => AlatHiking::count(),
-            'total_unit' => AlatHiking::sum('stok_total'),
+            'total_barang' => AlatHiking::withoutDuplicateListings()->count(),
+            'total_unit' => AlatHiking::withoutDuplicateListings()->sum('stok_total'),
             'transaksi_pending' => Transaksi::where('status_transaksi', 'Pending')->count(),
             'transaksi_disetujui' => Transaksi::where('status_transaksi', 'Disetujui')->count(),
             'transaksi_berjalan' => Transaksi::where('status_transaksi', 'Berjalan')->count(),
@@ -56,4 +56,3 @@ class DashboardController extends Controller
         ));
     }
 }
-

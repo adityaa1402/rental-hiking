@@ -33,7 +33,6 @@
             {{-- Image & quick info --}}
             <div class="col-lg-5">
                 @php
-                    $paketImagePath = 'uploads/paket/' . basename($paket->gambar ?? '');
                     $gambarPromosiPaket = [
                         'paket-hemat-pendaki-solo' => 'paket-hemat-solo.png',
                         'paket-hemat-berdua' => 'paket-hemat-berdua.png',
@@ -43,9 +42,7 @@
                     $isPromotionalPackage = $gambarPromosiPaket !== null;
                     $paketImageUrl = $gambarPromosiPaket
                         ? asset('assets/images/' . $gambarPromosiPaket)
-                        : ($paket->gambar && is_file(public_path($paketImagePath))
-                            ? asset($paketImagePath)
-                            : ($paket->gambar ? Storage::disk('public')->url($paket->gambar) : null));
+                        : ($paket->gambar ? getPackageImageUrl($paket) : null);
                 @endphp
                 @if($paketImageUrl)
                     <img src="{{ $paketImageUrl }}" alt="{{ $paket->nama_paket }}"

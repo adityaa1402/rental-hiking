@@ -47,6 +47,9 @@
                 <a class="nav-link {{ request()->routeIs('admin.customer.*') ? 'active' : '' }}" href="{{ route('admin.customer.index') }}">
                     <i class="bi bi-people"></i> Data Customer
                 </a>
+                <a class="nav-link {{ request()->routeIs('admin.pesan.*') ? 'active' : '' }}" href="{{ route('admin.pesan.index') }}">
+                    <i class="bi bi-envelope"></i> Pesan Masuk
+                </a>
             </nav>
 
             <div class="px-2 mb-2"><div class="small text-white-50 text-uppercase fw-semibold" style="font-size:0.7rem;letter-spacing:1px;">Operasional</div></div>
@@ -72,7 +75,7 @@
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="nav-link text-danger small border-0 bg-transparent w-100 text-start">
-                        <i class="bi bi-box-arrow-right"></i> Keluar (Logout)
+                        <i class="bi bi-box-arrow-right"></i> Logout
                     </button>
                 </form>
             </div>
@@ -119,6 +122,7 @@
                         <a class="nav-link" href="{{ route('admin.kategori.index') }}"><i class="bi bi-tags"></i> Kategori</a>
                         <a class="nav-link" href="{{ route('admin.paket.index') }}"><i class="bi bi-boxes"></i> Paket Sewa</a>
                         <a class="nav-link" href="{{ route('admin.customer.index') }}"><i class="bi bi-people"></i> Customer</a>
+                        <a class="nav-link {{ request()->routeIs('admin.pesan.*') ? 'active' : '' }}" href="{{ route('admin.pesan.index') }}"><i class="bi bi-envelope"></i> Pesan Masuk</a>
                         <a class="nav-link" href="{{ route('admin.transaksi.index') }}"><i class="bi bi-receipt"></i> Transaksi</a>
                         <a class="nav-link" href="{{ route('admin.laporan.index') }}"><i class="bi bi-file-earmark-bar-graph"></i> Laporan</a>
                         <a class="nav-link" href="{{ route('admin.pengaturan.index') }}"><i class="bi bi-gear"></i> Pengaturan</a>

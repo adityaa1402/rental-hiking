@@ -152,7 +152,7 @@
                     <div id="imagePreview" class="rounded-3 bg-light d-flex align-items-center justify-content-center" 
                          style="width:100%;height:250px;min-height:250px;">
                         @if($barang->gambar)
-                            <img src="{{ Storage::url('barang/' . $barang->gambar) }}" style="width:100%;height:250px;object-fit:cover;" class="rounded-3">
+                            <img src="{{ getProductImageUrl($barang) }}" alt="{{ $barang->nama_alat }}" style="width:100%;height:250px;object-fit:cover;" class="rounded-3">
                         @else
                             <div class="text-center">
                                 <i class="bi bi-image text-muted" style="font-size:3rem;"></i>

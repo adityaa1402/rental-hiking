@@ -222,7 +222,6 @@
                                 fn ($detail) => ($detail->alatHiking?->harga_per_hari ?? 0) * $detail->jumlah_unit
                             );
                             $hemat = max(0, $hargaNormal - $paket->harga_paket_per_hari);
-                            $gambarPaketPath = 'uploads/paket/' . basename($paket->gambar ?? '');
                             $gambarPromosiPaket = [
                                 'paket-hemat-pendaki-solo' => 'paket-hemat-solo.png',
                                 'paket-hemat-berdua' => 'paket-hemat-berdua.png',
@@ -231,9 +230,7 @@
                             ][$paket->slug] ?? null;
                             $gambarPaketUrl = $gambarPromosiPaket
                                 ? asset('assets/images/' . $gambarPromosiPaket)
-                                : ($paket->gambar && is_file(public_path($gambarPaketPath))
-                                    ? asset($gambarPaketPath)
-                                    : ($paket->gambar ? asset('storage/' . $paket->gambar) : asset('assets/images/logo.svg')));
+                                : getPackageImageUrl($paket);
                         @endphp
                         <div class="col-md-6 col-xl-3">
                             <article class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden">

@@ -104,11 +104,11 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-semibold">Nama Lengkap <span class="text-danger">*</span></label>
-                                <input type="text" name="nama" class="form-control" placeholder="Contoh: Budi Santoso" value="{{ old('nama') }}" required>
+                                <input type="text" name="nama" class="form-control" placeholder="Contoh: Budi Santoso" value="{{ old('nama', auth()->user()?->nama_lengkap) }}" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-semibold">Alamat Email <span class="text-danger">*</span></label>
-                                <input type="email" name="email" class="form-control" placeholder="nama@email.com" value="{{ old('email') }}" required>
+                                <input type="email" name="email" class="form-control" placeholder="nama@email.com" value="{{ old('email', auth()->user()?->email) }}" required>
                             </div>
                             <div class="col-12">
                                 <label class="form-label small fw-semibold">Subjek Pesan <span class="text-danger">*</span></label>

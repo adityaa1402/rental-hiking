@@ -75,7 +75,7 @@
                 @forelse($transaksiList as $idx => $tx)
                     <tr>
                         <td class="ps-4 text-muted">{{ $transaksiList->firstItem() + $idx }}</td>
-                        <td class="font-monospace fw-bold">{{ $tx->id_transaksi }}</td>
+                        <td class="font-monospace fw-bold">{{ $tx->kode_transaksi }}</td>
                         <td>{{ $tx->user->nama_lengkap ?? '-' }}</td>
                         <td class="small">{{ \Carbon\Carbon::parse($tx->tgl_sewa)->format('d/m') }} - {{ \Carbon\Carbon::parse($tx->tgl_kembali)->format('d/m/Y') }}</td>
                         <td class="text-end fw-bold text-success">{{ formatRupiah($tx->total_harga) }}</td>

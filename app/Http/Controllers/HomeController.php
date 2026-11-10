@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AlatHiking;
 use App\Models\Kategori;
+use App\Models\PesanKontak;
 use App\Models\PaketSewa;
 use App\Models\Pengaturan;
 use Illuminate\Http\Request;
@@ -72,8 +73,10 @@ class HomeController extends Controller
             'pesan.required' => 'Isi pesan wajib diisi.',
         ]);
 
-        // Dalam implementasi real, kirim email atau simpan ke database
-        // Untuk sekarang, hanya redirect dengan success message
+        PesanKontak::create([
+            ...$validated,
+            'id_user' => $request->user()?->id,
+        ]);
 
         return redirect()->route('kontak')->with('success', 'Pesan Anda berhasil dikirim!');
     }

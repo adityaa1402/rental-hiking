@@ -51,7 +51,7 @@
                 </li>
             </ul>
 
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2 ms-lg-auto">
                 @auth
                     @if(auth()->user()->role === 'admin')
                         <a href="{{ route('admin.dashboard') }}" class="btn btn-warning btn-sm px-3 fw-bold">
@@ -64,11 +64,6 @@
                                 <span>{{ auth()->user()->nama_lengkap }}</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
-                                <li>
-                                    <div class="px-3 py-1 text-muted small border-bottom mb-2">
-                                        Role: <span class="badge bg-success">Customer</span>
-                                    </div>
-                                </li>
                                 <li><a class="dropdown-item py-2" href="{{ route('customer.dashboard') }}"><i class="bi bi-grid-fill me-2 text-primary"></i> Dashboard</a></li>
                                 <li><a class="dropdown-item py-2" href="{{ route('customer.transaksi.index') }}"><i class="bi bi-receipt-cutoff me-2 text-primary"></i> Riwayat Sewa</a></li>
                                 <li><a class="dropdown-item py-2" href="{{ route('customer.profil.index') }}"><i class="bi bi-person-gear me-2 text-primary"></i> Profil Akun</a></li>
@@ -84,12 +79,6 @@
                             </ul>
                         </div>
                     @endif
-                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-outline-danger btn-sm px-3 ms-1" title="Keluar">
-                            <i class="bi bi-box-arrow-right"></i>
-                        </button>
-                    </form>
                 @else
                     <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm px-3">
                         <i class="bi bi-box-arrow-in-right me-1"></i> Masuk

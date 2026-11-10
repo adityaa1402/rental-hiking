@@ -35,6 +35,11 @@ class User extends Authenticatable
         return $this->hasMany(Transaksi::class, 'id_user', 'id');
     }
 
+    public function pesanKontak(): HasMany
+    {
+        return $this->hasMany(PesanKontak::class, 'id_user', 'id');
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';

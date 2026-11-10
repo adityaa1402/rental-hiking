@@ -254,9 +254,11 @@ if (!function_exists('getProductImageUrl')) {
             return asset('assets/images/logo.svg');
         }
 
-        $gallery = \App\Models\BarangGallery::where('id_alat', $item->id_alat)
-            ->orderBy('urutan')
-            ->first();
+        $gallery = $item->relationLoaded('gallery')
+            ? $item->gallery->first()
+            : \App\Models\BarangGallery::where('id_alat', $item->id_alat)
+                ->orderBy('urutan')
+                ->first();
 
         foreach ([$item->gambar, $gallery?->gambar] as $image) {
             if (!$image) {
@@ -277,6 +279,49 @@ if (!function_exists('getProductImageUrl')) {
             if (\Illuminate\Support\Facades\Storage::disk('public')->exists($image)) {
                 return \Illuminate\Support\Facades\Storage::disk('public')->url($image);
             }
+        }
+
+        return asset('assets/images/logo.svg');
+    }
+}
+
+if (!function_exists('getPackageImageUrl')) {
+    function getPackageImageUrl($package): string
+    {
+        $promotionalImages = [
+            'paket-hemat-pendaki-solo' => 'paket-hemat-solo.png',
+            'paket-hemat-berdua' => 'paket-hemat-berdua.png',
+            'paket-hemat-keluarga' => 'paket-hemat-keluarga.png',
+            'paket-hemat-rombongan-4-orang' => 'paket-hemat-rombongan.png',
+        ];
+        $promotionalImage = $promotionalImages[$package->slug ?? ''] ?? null;
+
+        if ($promotionalImage && is_file(public_path('assets/images/' . $promotionalImage))) {
+            return rtrim(request()->getBaseUrl(), '/') . '/assets/images/' . $promotionalImage;
+        }
+
+        $image = $package->gambar ?? null;
+
+        if (!$image) {
+            return asset('assets/images/logo.svg');
+        }
+
+        $image = ltrim(str_replace('\\', '/', $image), '/');
+        $basePath = rtrim(request()->getBaseUrl(), '/');
+        $publicPath = public_path($image);
+
+        if (is_file($publicPath)) {
+            return $basePath . '/' . $image;
+        }
+
+        $legacyPath = 'uploads/paket/' . basename($image);
+        if (is_file(public_path($legacyPath))) {
+            return $basePath . '/' . $legacyPath;
+        }
+
+        $storagePath = str_starts_with($image, 'paket/') ? $image : 'paket/' . basename($image);
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($storagePath)) {
+            return $basePath . '/storage/' . $storagePath;
         }
 
         return asset('assets/images/logo.svg');

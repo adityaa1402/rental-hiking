@@ -13,6 +13,16 @@
 <form method="POST" action="{{ route('admin.paket.store') }}" enctype="multipart/form-data" class="needs-validation">
     @csrf
 
+    @if($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <div class="row g-4">
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
@@ -21,7 +31,7 @@
                 <div class="mb-3">
                     <label class="form-label fw-bold">Nama Paket</label>
                     <input type="text" name="nama_paket" class="form-control form-control-sm @error('nama_paket') is-invalid @enderror" 
-                           placeholder="Contoh: Paket Camping 2 Hari, Paket Mountain Trek" required>
+                           placeholder="Contoh: Paket Camping 2 Hari, Paket Mountain Trek" value="{{ old('nama_paket') }}" required>
                     @error('nama_paket')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
@@ -30,7 +40,7 @@
                 <div class="mb-3">
                     <label class="form-label fw-bold">Deskripsi</label>
                     <textarea name="deskripsi" class="form-control form-control-sm @error('deskripsi') is-invalid @enderror" 
-                              rows="4" placeholder="Jelaskan paket ini..."></textarea>
+                              rows="4" placeholder="Jelaskan paket ini..." required>{{ old('deskripsi') }}</textarea>
                     @error('deskripsi')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
@@ -40,7 +50,7 @@
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Kapasitas Orang</label>
                         <input type="number" name="kapasitas_orang" class="form-control form-control-sm @error('kapasitas_orang') is-invalid @enderror" 
-                               min="1" required>
+                               min="1" value="{{ old('kapasitas_orang', 1) }}" required>
                         @error('kapasitas_orang')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
@@ -50,7 +60,7 @@
                         <div class="input-group input-group-sm">
                             <span class="input-group-text">Rp</span>
                             <input type="number" name="harga_paket_per_hari" class="form-control @error('harga_paket_per_hari') is-invalid @enderror" 
-                                   min="0" required>
+                                   min="0" value="{{ old('harga_paket_per_hari') }}" required>
                         </div>
                         @error('harga_paket_per_hari')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -59,37 +69,6 @@
                 </div>
             </div>
 
-            <!-- Item Paket -->
-            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
-                <h6 class="fw-bold mb-3 border-bottom pb-2">
-                    <i class="bi bi-list-check me-2"></i>Pilih Item Paket
-                </h6>
-
-                <div id="itemsContainer">
-                    <div class="item-row mb-3">
-                        <div class="row g-2">
-                            <div class="col-md-8">
-                                <select name="items[0][id_alat]" class="form-select form-select-sm" required>
-                                    <option value="">-- Pilih Barang --</option>
-                                    @foreach($alatList as $alat)
-                                        <option value="{{ $alat->id_alat }}">{{ $alat->nama_barang }} (Rp{{ number_format($alat->harga_sewa_perhari, 0, ',', '.') }}/hari)</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <input type="number" name="items[0][jumlah]" class="form-control form-control-sm" placeholder="Qty" min="1" value="1">
-                            </div>
-                            <div class="col-md-1">
-                                <button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="removeItem(this)">Hapus</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <button type="button" class="btn btn-outline-primary btn-sm" onclick="addItem()">
-                    <i class="bi bi-plus-circle me-1"></i> Tambah Item
-                </button>
-            </div>
         </div>
 
         <!-- Sidebar: Gambar & Status -->
@@ -109,13 +88,46 @@
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
                 <h6 class="fw-bold mb-3 border-bottom pb-2">Status</h6>
                 <div class="form-check">
-                    <input type="checkbox" name="status_aktif" class="form-check-input" id="statusAktif" checked>
+                    <input type="checkbox" name="status_aktif" class="form-check-input" id="statusAktif" value="1" {{ old('status_aktif', '1') ? 'checked' : '' }}>
                     <label class="form-check-label" for="statusAktif">
                         Aktifkan paket
                     </label>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+        <h6 class="fw-bold mb-3 border-bottom pb-2">
+            <i class="bi bi-list-check me-2"></i>Pilih Item Paket
+        </h6>
+
+        <div id="itemsContainer">
+            <div class="item-row mb-3">
+                <div class="row g-2">
+                    <div class="col-md-9">
+                        <select name="items[0][id_alat]" class="form-select form-select-sm" required>
+                            <option value="">-- Pilih Barang --</option>
+                            @foreach($alatList as $alat)
+                                <option value="{{ $alat->id_alat }}" {{ old('items.0.id_alat') == $alat->id_alat ? 'selected' : '' }}>
+                                    {{ $alat->nama_alat }} - {{ $alat->merk }} ({{ formatRupiah($alat->harga_per_hari) }}/hari)
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" name="items[0][jumlah]" class="form-control form-control-sm" placeholder="Qty" min="1" value="{{ old('items.0.jumlah', 1) }}" required>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="removeItem(this)">Hapus</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-outline-primary btn-sm align-self-start" onclick="addItem()">
+            <i class="bi bi-plus-circle me-1"></i> Tambah Item
+        </button>
     </div>
 
     <div class="d-flex gap-2 mt-4">
@@ -135,15 +147,15 @@ function addItem() {
     row.className = 'item-row mb-3';
     row.innerHTML = `
         <div class="row g-2">
-            <div class="col-md-8">
+            <div class="col-md-9">
                 <select name="items[${itemCount}][id_alat]" class="form-select form-select-sm" required>
                     <option value="">-- Pilih Barang --</option>
                     @foreach($alatList as $alat)
-                        <option value="{{ $alat->id_alat }}">{{ $alat->nama_barang }}</option>
+                        <option value="{{ $alat->id_alat }}">{{ $alat->nama_alat }} - {{ $alat->merk }} ({{ formatRupiah($alat->harga_per_hari) }}/hari)</option>
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <input type="number" name="items[${itemCount}][jumlah]" class="form-control form-control-sm" placeholder="Qty" min="1" value="1">
             </div>
             <div class="col-md-1">

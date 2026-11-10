@@ -73,7 +73,7 @@
                     <tr>
                         <td class="ps-4">
                             @if($alat->gambar)
-                                <img src="{{ Storage::url('barang/' . $alat->gambar) }}" class="rounded-3"
+                                <img src="{{ getProductImageUrl($alat) }}" alt="{{ $alat->nama_alat }}" class="rounded-3"
                                     style="width:55px;height:50px;object-fit:cover;">
                             @else
                                 <div class="rounded-3 bg-light d-flex align-items-center justify-content-center"
@@ -156,4 +156,3 @@
 </div>
 
 @endsection
-

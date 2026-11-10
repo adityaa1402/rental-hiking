@@ -7,6 +7,7 @@ use App\Models\AlatHiking;
 use App\Models\Kategori;
 use App\Models\Pengaturan;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 
 class BarangController extends Controller
@@ -14,7 +15,7 @@ class BarangController extends Controller
     public function index(Request $request)
     {
         $setting = Pengaturan::getSetting();
-        $query = AlatHiking::with('kategori');
+        $query = AlatHiking::with('kategori', 'gallery')->withoutDuplicateListings();
 
         if ($request->filled('q')) {
             $q = $request->q;
@@ -44,7 +45,15 @@ class BarangController extends Controller
     {
         $request->validate([
             'id_kategori'   => 'required|exists:kategori,id_kategori',
-            'nama_alat'     => 'required|string|max:150',
+            'nama_alat'     => [
+                'required',
+                'string',
+                'max:150',
+                Rule::unique('alat_hiking', 'nama_alat')
+                    ->where('merk', $request->input('merk'))
+                    ->where('id_kategori', $request->input('id_kategori'))
+                    ->where('kondisi', $request->input('kondisi')),
+            ],
             'merk'          => 'required|string|max:100',
             'deskripsi'     => 'required|string',
             'spesifikasi'   => 'required|string',
@@ -53,6 +62,8 @@ class BarangController extends Controller
             'stok_rusak'    => 'nullable|integer|min:0|lte:stok_total',
             'kondisi'       => 'required|in:Baik,Perlu Perawatan,Rusak,Sedang Dibersihkan',
             'gambar'        => 'required|image|mimes:jpg,jpeg,png,webp|max:3072',
+        ], [
+            'nama_alat.unique' => 'Barang dengan nama, merek, kategori, dan kondisi yang sama sudah terdaftar.',
         ]);
 
         $gambarPath = $request->file('gambar')->store('barang', 'public');
@@ -69,14 +80,14 @@ class BarangController extends Controller
     public function show(int $id)
     {
         $setting = Pengaturan::getSetting();
-        $barang = AlatHiking::with('kategori')->findOrFail($id);
+        $barang = AlatHiking::with('kategori', 'gallery')->findOrFail($id);
         return view('admin.barang.show', compact('setting', 'barang'));
     }
 
     public function edit(int $id)
     {
         $setting = Pengaturan::getSetting();
-        $barang = AlatHiking::findOrFail($id);
+        $barang = AlatHiking::with('gallery')->findOrFail($id);
         $kategoriList = Kategori::all();
         return view('admin.barang.edit', compact('setting', 'barang', 'kategoriList'));
     }
@@ -86,7 +97,16 @@ class BarangController extends Controller
         $barang = AlatHiking::findOrFail($id);
         $request->validate([
             'id_kategori'   => 'required|exists:kategori,id_kategori',
-            'nama_alat'     => 'required|string|max:150',
+            'nama_alat'     => [
+                'required',
+                'string',
+                'max:150',
+                Rule::unique('alat_hiking', 'nama_alat')
+                    ->where('merk', $request->input('merk'))
+                    ->where('id_kategori', $request->input('id_kategori'))
+                    ->where('kondisi', $request->input('kondisi'))
+                    ->ignore($barang->id_alat, 'id_alat'),
+            ],
             'merk'          => 'required|string|max:100',
             'deskripsi'     => 'required|string',
             'spesifikasi'   => 'required|string',
@@ -95,6 +115,8 @@ class BarangController extends Controller
             'stok_rusak'    => 'required|integer|min:0|lte:stok_total',
             'kondisi'       => 'required|in:Baik,Perlu Perawatan,Rusak,Sedang Dibersihkan',
             'gambar'        => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
+        ], [
+            'nama_alat.unique' => 'Barang dengan nama, merek, kategori, dan kondisi yang sama sudah terdaftar.',
         ]);
 
         $data = $request->except('gambar');

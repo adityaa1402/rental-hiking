@@ -37,7 +37,7 @@
             @php $no = 1; @endphp
             @forelse($transaksiList as $tx)
                 <tr>
-                    <td>{{ $tx->id_transaksi }}</td>
+                    <td>{{ $tx->kode_transaksi }}</td>
                     <td>{{ $tx->user->nama_lengkap ?? '-' }}</td>
                     <td>{{ \Carbon\Carbon::parse($tx->tgl_sewa)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($tx->tgl_kembali)->format('d/m/Y') }}</td>
                     <td>{{ $tx->total_hari }}</td>

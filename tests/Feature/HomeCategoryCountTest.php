@@ -44,5 +44,10 @@ class HomeCategoryCountTest extends TestCase
 
         $response->assertOk();
         $this->assertSame(1, $response->viewData('kategoriList')->first()->alat_hiking_count);
+
+        $catalogResponse = $this->get('/katalog');
+
+        $catalogResponse->assertOk();
+        $this->assertSame(1, $catalogResponse->viewData('items')->total());
     }
 }
